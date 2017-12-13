@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ENERGY">
+	
+    <typeAlias alias="energyData" type="com.module.energy.dto.EnergyDto"/>
+    
+	<select id="getEnergyData" resultClass="energyData">
+		SELECT *
+		FROM ENERGY_FUTURE
+	</select>
+    
+	<select id="getTimeGraph_month" resultClass="energyData">
+		SELECT B.* FROM
+		(
+			SELECT 
+				A.AREA_CODE, A.YEAR AS TIME_YEAR, A.MONTH AS TIME_MONTH, CONCAT(YEAR,IF(MONTH&lt;10,CONCAT('0',MONTH),MONTH)) AS TIME_DATE
+				<isNotEmpty prepend="," property="future_kw">    	        
+					A.VAL*$future_kw$ AS TIME_VAL
+	    	    </isNotEmpty>
+				<isEmpty prepend="," property="future_kw">    	        
+					A.VAL AS TIME_VAL
+	    	    </isEmpty>
+			FROM ENERGY_MONTH A
+		) B
+		WHERE 1=1
+		AND B.AREA_CODE = #area_code#
+		AND B.TIME_DATE BETWEEN #start_ym# AND #end_ym#
+	</select>
+    
+	<select id="getTimeGraph_day" resultClass="energyData">
+		SELECT 
+			YEAR AS TIME_YEAR, MONTH AS TIME_MONTH, DAY AS TIME_DAY
+			<isNotEmpty prepend="," property="future_kw">    	        
+				VAL*$future_kw$ AS TIME_VAL
+    	    </isNotEmpty>
+			<isEmpty prepend="," property="future_kw">    	        
+				VAL AS TIME_VAL
+    	    </isEmpty>
+		FROM ENERGY_DAY
+		WHERE AREA_CODE = #area_code#
+		AND YEAR = #start_year#
+		AND MONTH = #start_month#
+	</select>
+	
+	<select id="getSpaceGraph" resultClass="energyData">
+		SELECT 
+			A.AREA_CODE, B.SUB_NAME
+			<isNotEmpty prepend="," property="future_kw">    	        
+    	       SUM(A.VAL)*$future_kw$  AS TIME_VAL
+    	    </isNotEmpty>
+			<isEmpty prepend="," property="future_kw">    	        
+    	       SUM(A.VAL) AS TIME_VAL
+    	    </isEmpty>
+		FROM ENERGY_MONTH A, ENERGY_SUBAREA B
+		WHERE A.AREA_CODE = B.AREA_CODE
+		AND B.MASTER_CODE = #master_code#
+		AND A.YEAR = #time_year#
+		<isNotEmpty prepend="AND" property="time_month">
+			A.MONTH = #time_month#
+   	    </isNotEmpty>
+		GROUP BY A.AREA_CODE
+		ORDER BY TIME_VAL DESC
+	</select>
+	
+	<select id="getFutureGraph" resultClass="energyData">
+		SELECT
+			AREA_CODE,
+			TIME AS FUTURE_TIME
+			<isNotEmpty prepend="," property="future_kw">    	        
+    	       FUTURE_VAL*$future_kw$ AS FUTURE_VAL
+    	    </isNotEmpty>
+			<isEmpty prepend="," property="future_kw">    	        
+    	       FUTURE_VAL
+    	    </isEmpty>
+		FROM ENERGY_FUTURE
+		WHERE AREA_CODE = #area_code#
+	</select>
+	
+	<select id="getAreaXY" resultClass="energyData">
+		SELECT
+			*
+		FROM ENERGY_SUBAREA
+		WHERE AREA_CODE = #area_code#
+	</select>
+	
+	<select id="getCodeList" resultClass="energyData">
+		SELECT
+			*
+		FROM ENERGY_SUBAREA
+		WHERE MASTER_CODE = #master_code#
+	</select>
+	
+</sqlMap>
