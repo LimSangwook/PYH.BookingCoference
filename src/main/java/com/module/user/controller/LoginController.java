@@ -70,6 +70,25 @@ public class LoginController extends CommonWebUtils {
 	}
 	
 	/**
+	 * 관리자 로그인 화면
+	 * @param request
+	 * @param user 
+	 * @return
+	 * @throws Exception
+	 */	
+	@RequestMapping({"siteManage/login222"})
+	public ModelAndView adminLogin222(HttpServletRequest request, UserDto user) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".adminLogin()");
+		
+		ModelAndView mav = new ModelAndView("empty/admin/login/login");
+		
+		user.setUser_id(CommonWebUtils.getCookie(request, "siteManageLoginId"));
+		mav.addObject("theForm", user);
+		
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".adminLogin()");
+		return mav;
+	}
+	/**
 	 * 사용자 로그인 화면
 	 * @param request
 	 * @param user 
