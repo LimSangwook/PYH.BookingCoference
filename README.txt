@@ -20,4 +20,5 @@ CREATE TABLE `meetingroom_info` (
 COMMENT='Meeting Room Info\r\nAdded by Karl on 2017.12.13'
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
+AUTO_INCREMENT=3
 ;
