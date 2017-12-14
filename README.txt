@@ -22,3 +22,8 @@ COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 AUTO_INCREMENT=3
 ;
+
+
+# 회의실 목록 메뉴
+update menu_info set LINK_ADDRESS = '/reservation/manager/meetingroomList.do' where MENU_CODE = 'manager'
+http://localhost:8080/siteManage/reservation/manager/meetingroomList.do

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="MEETINGROOM">
+	
+    <typeAlias alias="meetingroom" type="com.module.meetingroom.dto.MeetingroomDto"/>
+    
+    <sql id="meetingColumn">
+    	MEETINGROOM_KEY
+    ,	NAME
+    ,	TYPE
+    ,	SIZE
+    ,	MAX_CAPACITY
+    ,	FACILITY
+   	,	HOURLY_PRICE
+   	,	PUBLISH
+   	,	MASTER_IMAGE
+   	,	REG_DATE
+   	,	MOD_DATE
+   	,	DEL_DATE		
+   	,	REG_ID		
+   	,	MOD_ID
+   	,	DEL_ID
+    </sql>
+
+	<select id="getMeetingroomList" resultClass="meetingroom">
+	/* MEETINGROOM.getMeetingroomList */
+	
+	SELECT <include refid="meetingColumn"/>
+	,	CASE PUBLISH WHEN 0 THEN '비노출' ELSE '노출' END PUBLISH_NAME
+	FROM MEETINGROOM_INFO
+	ORDER BY MEETINGROOM_KEY
+	</select>
+
+	<select id="getMeetingInfo" resultClass="meetingroom">
+	/* MEETINGROOM.getMeetingInfo */
+	
+	SELECT <include refid="meetingColumn"/>
+	,	CASE PUBLISH WHEN 0 THEN '비노출' ELSE '노출' END PUBLISH_NAME
+	FROM MEETINGROOM_INFO
+	WHERE MEETINGROOM_KEY = #meetingroom_key#
+	</select>
+	
+</sqlMap>
