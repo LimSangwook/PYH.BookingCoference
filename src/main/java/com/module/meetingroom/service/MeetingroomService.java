@@ -2,6 +2,8 @@ package com.module.meetingroom.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.module.meetingroom.dto.MeetingroomDto;
 import com.module.reserve.dto.ReserveDto;
 
@@ -20,19 +22,19 @@ public interface MeetingroomService {
 	public MeetingroomDto getMeetingroomInfo(String meetingroomKey) throws Exception;
 	
 	/**
-	 * 
+	 * 회의실 생성
 	 * */
-	public void insertReserveInfo(ReserveDto reserve) throws Exception;
+	public int insertMeetingroomInfo(HttpServletRequest request, MeetingroomDto meetingroom) throws Exception;
 	
 	/**
-	 * 포럼/박람회 정보수정
+	 * 회의실 정보수정
 	 * */
-	public void updateReserveInfo(ReserveDto reserve) throws Exception;
+	public void updateMeetingroomInfo(HttpServletRequest request, MeetingroomDto meetingroom) throws Exception;
 	
 	/**
-	 * 포럼/박람회 정보삭제
+	 * 회의실 정보삭제
 	 * */
-	public void deleteReserveInfo(ReserveDto reserve) throws Exception;
+	public void deleteMeetingroomInfo(HttpServletRequest request, MeetingroomDto meetingroom) throws Exception;
 	
 	/**
 	 * 현재 진행중인 포럼/박람회 조회

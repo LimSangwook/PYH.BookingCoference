@@ -13,7 +13,7 @@
     ,	FACILITY
    	,	HOURLY_PRICE
    	,	PUBLISH
-   	,	MASTER_IMAGE
+   	,	ATTACH_CNT
    	,	REG_DATE
    	,	MOD_DATE
    	,	DEL_DATE		
@@ -28,6 +28,7 @@
 	SELECT <include refid="meetingColumn"/>
 	,	CASE PUBLISH WHEN 0 THEN '비노출' ELSE '노출' END PUBLISH_NAME
 	FROM MEETINGROOM_INFO
+	WHERE STATUS = 'Y'
 	ORDER BY MEETINGROOM_KEY
 	</select>
 
@@ -40,4 +41,73 @@
 	WHERE MEETINGROOM_KEY = #meetingroom_key#
 	</select>
 	
+    <insert id="insertMeetingroomInfo">
+    /* MEETINGROOM.insertMeetingroomInfo */
+    
+    INSERT INTO MEETINGROOM_INFO(
+    	NAME
+    ,	TYPE
+    ,	SIZE
+    ,	MAX_CAPACITY
+    ,	FACILITY
+   	,	HOURLY_PRICE
+   	,	PUBLISH
+   	,	REG_DATE		
+   	,	REG_ID
+    ) VALUES (
+    	#name#
+    ,	#type#
+    ,	#size#
+    ,	#max_capacity#
+    ,	#facility#
+    ,	#hourly_price#
+    ,	#publish#
+    ,	NOW()	
+    ,	#reg_id#
+    )
+    
+	   	<selectKey resultClass="int" >
+		SELECT @@IDENTITY AS MEETINGROOM_KEY
+		</selectKey>
+    </insert>
+    
+  
+    <update id="updateMeetingroomInfo">
+    /* MEETINGROOM.updateMeetingroomInfo */
+    
+    UPDATE MEETINGROOM_INFO SET
+    	NAME			= #name#
+    ,	TYPE			= #type#
+    ,	SIZE			= #size#
+    ,	MAX_CAPACITY	= #max_capacity#
+    ,	FACILITY		= #facility#
+   	,	HOURLY_PRICE	= #hourly_price#
+   	,	PUBLISH			= #publish#
+    ,	MOD_DATE		= NOW()
+   	,	MOD_ID			= #mod_id#
+    WHERE MEETINGROOM_KEY = #meetingroom_key#
+    </update>
+    
+	
+	<update id="updateFileCount">
+	/* MEETINGROOM.updateFileCount */
+	
+	UPDATE MEETINGROOM_INFO SET 
+		ATTACH_CNT = (
+			SELECT COUNT(*) CNT FROM MEETINGROOM_FILE
+			WHERE MEETINGROOM_KEY = #meetingroom_key# 
+			AND STATUS = 'Y')
+	WHERE MEETINGROOM_KEY = #meetingroom_key#
+	</update>
+	
+	
+	<update id="deleteMeetingroomInfo">
+	/* MEETINGROOM.deleteMeetingroomInfo */
+	
+	UPDATE MEETINGROOM_INFO SET 
+		STATUS = 'D'
+	,	DEL_DATE = NOW()
+	,	DEL_ID = #del_id#
+	WHERE MEETINGROOM_KEY = #meetingroom_key#
+	</update>
 </sqlMap>

@@ -3,7 +3,13 @@
 
 <fieldset>
 <legend></legend>
-<form:form commandName="theForm" action="userSave.do">
+
+<form:form commandName="theForm" action="meetingroomSave.do">
+<form:hidden path="act"/>
+<form:hidden path="meetingroom_key"/>
+
+<div id="hiddenSaveFileData"></div>
+<div id="hiddenRemoveFileData"></div>		
 
 	<table class="table_form">
 	<caption>회의실 등록</caption>
@@ -54,36 +60,68 @@
 		<tr>
 			<th scope="row">주요시설</th>
 			<td>
-				<form:input path="facility" title="주요시설" cssClass="col100" maxlength="8"/>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">사진</th>
-			<td>
-				<div class="uploadBox">
-					<div class="preview">
-						<p><img src="../../comn/img/noPhoto2.png" alt="썸네일이미지"></p>
-						<a href="#" class="btn btn_xsmall">파일찾기</a>
-					</div>
-					<div class="fileList">
-						<ul>
-							<li><a href="#">image.png</a><span class="">(9.04MB)</span> <a href="#" class="btn btn_xsmall">삭제</a></li>
-							<li class="on"><a href="#">image.png</a><span class="">(9.04MB)</span> <a href="#" class="btn btn_xsmall">삭제</a></li>
-							<li><a href="#">image.png</a><span class="">(9.04MB)</span> <a href="#" class="btn btn_xsmall">삭제</a></li>
-							<li><a href="#">image.png</a><span class="">(9.04MB)</span> <a href="#" class="btn btn_xsmall">삭제</a></li>
-							<li><a href="#">image.png</a><span class="">(9.04MB)</span> <a href="#" class="btn btn_xsmall">삭제</a></li>
-						</ul>
-					</div>
-				</div><!-- //uploadBox -->
+				<form:input path="facility" title="주요시설" cssClass="col100" maxlength="255"/>
 			</td>
 		</tr>
 	</tbody>
 </table><!-- //table_basic -->
-
-<div class="btn_wrap float_right">
-	<a href="room.html" class="btn ">목록</a>
-	<button type="submit" class="btn primary">등록</button>
-</div>
-
 </form:form>
 </fieldset>
+
+<table class="table_form">
+	<colgroup>
+			<col style="width:20%;" />
+			<col style="width:80%;" />
+	</colgroup>
+	<tbody>
+		<tr>
+			<th scope="row">사진</th>
+			<td id="fileuploadArea">
+				<jsp:include page="/WEB-INF/views/comm/attach_form_new.jsp"/>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<div class="btn_wrap float_right">
+	<a href="meetingroomList.do" class="btn ">목록</a>
+	<a href="javascript:viod(0);" class="btn primary btnSave">등록</a>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	$('#fileuploadArea').css( "height", "+=25px" );
+	var act = "${theForm.act}";
+	
+	// 등록/수정
+	$('.btnSave').on('click',function(){
+		if(formValidate()){
+			if(act == 'update'){
+				if(!confirm('수정하시겠습니까?')){
+					return;
+				}
+			} else {
+				if(!confirm('등록하시겠습니까?')){
+					return;
+				}
+			}
+			$('#theForm').submit();
+		}
+	});
+	
+	// 삭제
+	$(".btnDelete").on("click",function(){
+		if(confirm('삭제하시겠습니까?')){
+			$('#deleteForm').submit();
+		}
+	});
+	
+	$('#video_type').on('change',function(){		
+		if($(this).val() == '1'){
+			$('#link_address').prop('disabled',true);
+		} else {
+			$('#link_address').prop('disabled',false);
+		}
+	});
+});
+</script>

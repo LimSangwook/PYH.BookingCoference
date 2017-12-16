@@ -1,8 +1,10 @@
 package com.module.meetingroom.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import com.common.base.BaseForm;
+import com.module.file.dto.FileDto;
 
 public class MeetingroomDto extends BaseForm{
 
@@ -35,8 +37,8 @@ public class MeetingroomDto extends BaseForm{
 	/* 미팅룸 공개여부 한글*/
 	private String publish_name;
 	
-	/* 미팅룸 메인이미지 */
-	private String master_image;
+	/* 미팅룸 이미지 수 */
+	private int attach_cnt;	
 
 	/* 미팅룸 등록일 */
 	private Date reg_date;
@@ -55,6 +57,9 @@ public class MeetingroomDto extends BaseForm{
 
 	/* 미팅룸 삭제자ID */
 	private String del_id;
+	
+	/* 미팅룸 사진 목록 */
+	private List<FileDto> fileList;
 
 	public String getMeetingroom_key() {
 		return meetingroom_key;
@@ -128,12 +133,12 @@ public class MeetingroomDto extends BaseForm{
 		this.publish_name = publish_name;
 	}
 
-	public String getMaster_image() {
-		return master_image;
+	public int getAttach_cnt() {
+		return attach_cnt;
 	}
 
-	public void setMaster_image(String master_image) {
-		this.master_image = master_image;
+	public void setAttach_cnt(int attach_cnt) {
+		this.attach_cnt = attach_cnt;
 	}
 
 	public Date getReg_date() {
@@ -182,6 +187,14 @@ public class MeetingroomDto extends BaseForm{
 
 	public void setDel_id(String del_id) {
 		this.del_id = del_id;
+	}
+
+	public List<FileDto> getFileList() {
+		return fileList;
+	}
+
+	public void setFileList(List<FileDto> fileList) {
+		this.fileList = fileList;
 	}
 }
 

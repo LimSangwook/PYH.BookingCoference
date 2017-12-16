@@ -41,6 +41,9 @@ public class FileDto implements Serializable {
 	/* 서비스 언어코드 */
 	private String lang_code;
 	
+	/* 미팅룸번호 */
+	private String meetingroom_key;
+	
 	
 	public String getLang_code() {
 		return lang_code;
@@ -139,4 +142,11 @@ public class FileDto implements Serializable {
 	public void setReg_date(Date reg_date) {
 		this.reg_date = reg_date;
 	}
+	public String getMeetingroom_key() {
+		return meetingroom_key;
+	}
+	public void setMeetingroom_key(String meetingroom_key) {
+		this.meetingroom_key = meetingroom_key;
+	}
+	
 }

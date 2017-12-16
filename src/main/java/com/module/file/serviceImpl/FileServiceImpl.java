@@ -30,4 +30,20 @@ public class FileServiceImpl implements FileService{
 	public void updateFileDownCount(FileDto file) throws Exception {
 		commonDao.update("FILE.updateFileDownCount", file);		
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<FileDto> getMeetingroomFileList(String meetingroomKey) throws Exception {
+		return (List<FileDto>)commonDao.queryForObjectList("MEETINGROOMFILE.getFileList", meetingroomKey);
+	}
+	
+	@Override
+	public FileDto getMeetingroomFileInfo(FileDto file) throws Exception {
+		return (FileDto)commonDao.queryForObject("MEETINGROOMFILE.getFileInfo", file);
+	}
+	
+	@Override
+	public void updateMeetingroomFileDownCount(FileDto file) throws Exception {
+		commonDao.update("MEETINGROOMFILE.updateFileDownCount", file);		
+	}
 }

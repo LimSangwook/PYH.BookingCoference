@@ -1,29 +1,46 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/comm/taglib.jsp"%>
-
+<link rel="stylesheet" href="/assets/admin/css/slick.css">
+<script src="/assets/admin/js/slick.min.js" type="text/javascript"></script>
 <div class="mr_list">	
-	<c:forEach var="data" items="${result}" varStatus="i">
+	<c:forEach var="data" items="${result}" varStatus="status">
 	<section>
 		<div class="mr_photo">
-			<div class="slider_for slickFor_mr_1">
-				<div><img src="../../comn/img/meetingroom_1.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_2.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_3.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_4.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_5.jpg" alt="" /></div>
+			<div class="slider_for slickFor_mr_${status.index}" id="slickFor_mr_${status.index}">
+				<c:forEach var="file" items="${data.fileList}" varStatus="substatus">
+					<div><img src="http://localhost:8080/upload/thumb${file.file_path}${file.save_file_name}" alt="meetingroom img" /></div>
+				</c:forEach>
 			</div>
-			<div class="slider_nav slickNav_mr_1">
-				<div><img src="../../comn/img/meetingroom_1.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_2.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_3.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_4.jpg" alt="" /></div>
-				<div><img src="../../comn/img/meetingroom_5.jpg" alt="" /></div>
+			<div class="slider_nav slickNav_mr_${status.index}">
+				<c:forEach var="file" items="${data.fileList}" varStatus="j">
+					<div><img src="http://localhost:8080/upload/thumb${file.file_path}${file.save_file_name}" alt="meetingroom img" /></div>
+				</c:forEach>
 			</div>
 			<div class="slider_btn">
-				<button type="button" class="slider_btn_prev slickPrev_mr_1"></button>
-				<button type="button" class="slider_btn_next slickNext_mr_1"></button>
+				<button type="button" class="slider_btn_prev slickPrev_mr_${status.index}"></button>
+				<button type="button" class="slider_btn_next slickNext_mr_${status.index}"></button>
 			</div>
 		</div>
+		<script type="text/javascript">
+		$(document).ready(function(){
+	
+			//회의실1
+			$('.slickFor_mr_${status.index}').slick({
+				slidesToShow: 1, slidesToScroll: 1, arrows: false, dots: false, fade: true, speed: 100, cssEase: 'linear', 
+				asNavFor: '.slickNav_mr_${status.index}'
+			});
+			$('.slickNav_mr_${status.index}').slick({
+				slidesToShow: 3, slidesToScroll: 1, arrows: false, dots: false, infinite: true, touchMove:true, focusOnSelect: true,
+				asNavFor: '.slickFor_mr_${status.index}'
+			});
+			$('.slickPrev_mr_${status.index}').on('click', function(){
+				$(".slickFor_mr_${status.index}").slick('slickPrev');
+			});
+			$('.slickNext_mr_${status.index}').on('click', function(){
+				$(".slickFor_mr_${status.index}").slick('slickNext');
+			});
+		});
+		</script>
 		<div class="mr_con">
 			<dl>
 				<dt>${data.name} <span class="label <c:if test="${1 eq data.publish}">primary</c:if>" >${data.publish_name}</span> </dt>
@@ -37,7 +54,7 @@
 					</ul>
 					<div class="btn_wrap">
 						<a href="meetingroomForm.do?meetingroom_key=${data.meetingroom_key}" class="btn btn_xsmall">수정</a>
-						<a href="#" class="btn btn_xsmall">삭제</a>
+						<a href="javascript:void(0);" onclick="deleteMeetingroom('${data.meetingroom_key}')" class="btn btn_xsmall">삭제</a>
 					</div>
 				</dd>
 			</dl>
@@ -56,3 +73,18 @@
 <div class="btn_wrap float_right">
 	<a href="meetingroomForm.do" class="btn primary">등록</a>
 </div>
+
+
+<form:form id="deleteForm" commandName="theForm" action="meetingroomSave.do">
+<form:hidden path="act" id="deleteAct" value="delete"/>
+<form:hidden path="meetingroom_key"/>
+</form:form>
+
+<script>	
+	function deleteMeetingroom(meetingroomKey){
+		if(confirm('삭제하시겠습니까?')){
+			$("input[name='meetingroom_key']").val(meetingroomKey);
+			$('#deleteForm').submit();
+		}
+	}
+</script>

@@ -34,6 +34,7 @@ ul,li {list-style:none;padding:0}
 .fileUploadLoading {display:none;width:64px;height:64px;/* position: absolute; */ z-index:9999;padding:45px 0 0 80px;}
 .thum img {width:220px !important;height:156px !important;border:0 !important;}
 </style>
+<link rel="stylesheet" href="/assets/plugin/fileupload/css/fileUploader.css" />
 <script type="text/javascript" src="/assets/plugin/fileupload/js/jquery.fileUploader.js?v=1.0"></script>
 
 <div class="addflie-list-area">	
@@ -47,17 +48,11 @@ ul,li {list-style:none;padding:0}
 		<ul id="fileUploadList">
 			<c:forEach var="data" items="${fileList}">
 				<c:set var="masterImage" value="${data.file_path}${data.save_file_name}"/>
-				<li file_seq="${data.file_key }" imageUrl="${data.file_path}${data.save_file_name}"><a href="javascript:;" class="file-name" >${data.real_file_name} <span><c:if test="${masterImage eq theForm.master_image}">[대표이미지]</c:if></span></a><a href="#" class="btn small delFile">삭제</a></li>
+				<li file_seq="${data.file_key }" imageUrl="${data.file_path}${data.save_file_name}"><a href="javascript:;" class="file-name" >${data.real_file_name} <span></span></a><a href="#" class="btn small delFile">삭제</a></li>
 			</c:forEach>			
 		</ul>
 	</div>
-	<div class="btns">		
-		<c:if test="${empty masterImageBtnUse}">
-		<button type="button" class="btn-ty3 masterImageSet">대표이미지로 설정</button>
-		</c:if>
-		<c:if test="${boardConfig.editor_use_yn eq 'Y'}">
-			<button type="button" class="btn-ty3 editorImageSet">본문삽입</button>
-		</c:if>		
+	<div class="btns">
 		<form action="/upload.do" method="post" enctype="multipart/form-data">
 			<input type="hidden" id="file_total_cnt" name="file_total_cnt" value="${boardConfig.file_count_limit}"/>
 			<input type="hidden" id="file_limit_cnt" value="${fileLimitCnt}"/>
@@ -77,6 +72,5 @@ ul,li {list-style:none;padding:0}
 				$(".fileUpload").css('cursor','pointer');
 			});
 		</script>
-		
 	</div>
 </div>

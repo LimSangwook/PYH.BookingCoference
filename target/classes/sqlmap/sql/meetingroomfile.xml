@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="MEETINGROOMFILE">
+	
+    <typeAlias alias="file" type="com.module.file.dto.FileDto"/>
+    
+    <sql id="fileColumn">
+    	FILE_KEY
+    ,	MEETINGROOM_KEY
+    ,	REAL_FILE_NAME
+    ,	SAVE_FILE_NAME
+    ,	FILE_PATH
+    ,	FILE_EXT
+    ,	FILE_SIZE
+    ,	FILE_DOWN_CNT
+    ,	IMAGE_WIDTH_SIZE
+    ,	IMAGE_HEIGHT_SIZE	
+    </sql>
+
+	<insert id="insertFile">
+	/* MEETINGROOM.insertFile */
+	
+	INSERT INTO MEETINGROOM_FILE
+	(
+		MEETINGROOM_KEY		
+    ,	REAL_FILE_NAME
+    ,	SAVE_FILE_NAME
+    ,	FILE_PATH
+    ,	FILE_EXT
+    ,	FILE_SIZE
+    ,	FILE_DOWN_CNT
+    ,	ORDER_LEVEL
+    ,	IMAGE_WIDTH_SIZE
+    ,	IMAGE_HEIGHT_SIZE
+    ,	STATUS
+    ,	REG_DATE
+	) VALUES (
+		#meetingroom_key#		
+    ,	#real_file_name#
+    ,	#save_file_name#
+    ,	#file_path#
+    ,	#file_ext#
+    ,	#file_size#
+    ,	#file_down_cnt#
+    ,	#order_level#
+    ,	#image_width_size#
+    ,	#image_height_size#
+    ,	'Y'
+    ,	now()
+	)
+	</insert>
+	
+	<select id="getFileList" resultClass="file">
+	/* MEETINGROOM.getFileList */
+	
+	SELECT <include refid="fileColumn"/> FROM MEETINGROOM_FILE
+	WHERE MEETINGROOM_KEY = #meetingroom_key#
+	AND STATUS = 'Y'
+	<!-- ORDER BY ORDER_LEVEL -->
+	</select>
+	
+	<select id="getFileInfo" resultClass="file">
+	/* MEETINGROOM.getFileInfo */
+	
+	SELECT <include refid="fileColumn"/> FROM MEETINGROOM_FILE
+	WHERE FILE_KEY = #file_key#
+	AND SAVE_FILE_NAME = #save_file_name#
+	AND STATUS = 'Y'	
+	</select>
+	
+	<update id="deleteFileInfo">
+	/* MEETINGROOM.deleteFileInfo */
+	
+	UPDATE MEETINGROOM_FILE SET STATUS = 'N'
+	WHERE FILE_KEY IN
+	<iterate property="remove" open="(" close=")" conjunction=",">
+		#remove[]#
+	</iterate>		
+	</update>
+	
+	<update id="updateFileOrderLevel">
+	/* MEETINGROOM.updateFileOrderLevel */
+	
+	UPDATE MEETINGROOM_FILE SET ORDER_LEVEL = #order_level#
+	WHERE FILE_KEY = #file_key#
+	AND MEETINGROOM_KEY = #meetingroom_key#
+	</update>
+	
+	<update id="updateFileDownCount">
+	/* MEETINGROOM.updateFileDownCount */
+	
+	UPDATE MEETINGROOM_FILE SET FILE_DOWN_CNT = FILE_DOWN_CNT+1
+	WHERE FILE_KEY = #file_key#
+	AND MEETINGROOM_KEY = #meetingroom_key#
+	</update>
+</sqlMap>
