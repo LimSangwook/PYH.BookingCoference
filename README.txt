@@ -1,3 +1,44 @@
+﻿CREATE TABLE `reservation_mapp` (
+	`RESERVATION_KEY` INT(11) NOT NULL,
+	`MEETINGROOM_KEY` INT(11) NOT NULL,
+	`RESERVATION_DATE` DATE NOT NULL,
+	`RESERVATION_TIME` CHAR(2) NOT NULL COMMENT '예약시작시간부터 한시간 단위 EX) 08 = 08~09시, 09 = 09~10시, 14 =14~15시',
+	`STATUS` CHAR(1) NOT NULL DEFAULT 'W' COMMENT 'C:취소 W:대기 A:승인 (현재사용X)',
+	`REG_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`MOD_TIME` DATETIME NULL DEFAULT NULL,
+	`CANCEL_TIME` DATETIME NULL DEFAULT NULL,
+	UNIQUE INDEX `MEETINGROOM_KEY_RESERVATION_DATE_RESERVATION_TIME` (`MEETINGROOM_KEY`, `RESERVATION_DATE`, `RESERVATION_TIME`),
+	INDEX `FK1_RESERVATION_KEY` (`RESERVATION_KEY`),
+	CONSTRAINT `FK1_RESERVATION_KEY` FOREIGN KEY (`RESERVATION_KEY`) REFERENCES `reservation_info` (`RESERVATION_KEY`),
+	CONSTRAINT `FK2_MEETINGROOM_KEY` FOREIGN KEY (`MEETINGROOM_KEY`) REFERENCES `meetingroom_info` (`MEETINGROOM_KEY`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `reservation_info` (
+	`RESERVATION_KEY` INT(11) NOT NULL AUTO_INCREMENT COMMENT '예약 키',
+	`RESERVATION_PWD` VARCHAR(30) NOT NULL COMMENT '예약 비밀번호',
+	`NAME` VARCHAR(20) NOT NULL COMMENT '예약자명',
+	`FIRM_NAME` VARCHAR(30) NOT NULL COMMENT '소속(기업명)',
+	`PHONE_NUMBER_1` CHAR(4) NOT NULL COMMENT '핸드폰번호1',
+	`STATUS` CHAR(1) NOT NULL DEFAULT 'W' COMMENT 'C:취소 W:대기 A:승인',
+	`STATUS_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'STATUS 상태 변경 시간',
+	`PHONE_NUMBER_2` CHAR(4) NOT NULL COMMENT '핸드폰번호2',
+	`PHONE_NUMBER_3` CHAR(4) NOT NULL COMMENT '핸드폰번호3',
+	`EMAIL_ADDR_1` VARCHAR(20) NOT NULL COMMENT '이메일',
+	`EMAIL_ADDR_2` VARCHAR(20) NULL DEFAULT NULL,
+	`EMAIL_ADDR_3` VARCHAR(20) NULL DEFAULT NULL,
+	`REQUEST` VARCHAR(50) NOT NULL COMMENT '요청사항',
+	`AGREE_TERM_PERSONAL_INFO` CHAR(1) NOT NULL COMMENT '개인정보 수집 및 이용 동의',
+	`TOTAL_PRICE` VARCHAR(7) NOT NULL COMMENT '총가격',
+	PRIMARY KEY (`RESERVATION_KEY`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=17
+;
+
 CREATE TABLE `meetingroom_info` (
 	`MEETINGROOM_KEY` INT(11) NOT NULL AUTO_INCREMENT,
 	`NAME` VARCHAR(50) NOT NULL,
@@ -14,7 +55,7 @@ CREATE TABLE `meetingroom_info` (
 	`REG_ID` VARCHAR(100) NOT NULL,
 	`MOD_ID` VARCHAR(100) NULL DEFAULT NULL,
 	`DEL_ID` VARCHAR(100) NULL DEFAULT NULL,
-	`STATUS` CHAR(1) NOT NULL DEFAULT 'Y',
+	`STATUS` CHAR(1) NOT NULL DEFAULT 'Y' COMMENT 'Y: 등록 D:삭제',
 	PRIMARY KEY (`MEETINGROOM_KEY`)
 )
 COMMENT='Meeting Room Info\r\nAdded by Karl on 2017.12.13'
@@ -44,16 +85,230 @@ CREATE TABLE `meetingroom_file` (
 COMMENT='미팅룸첨부파일정보'
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=327
+AUTO_INCREMENT=347
 ;
 
 
-# 회의실 목록 메뉴
-update menu_info set LINK_ADDRESS = '/reservation/manager/meetingroomList.do' where MENU_CODE = 'manager'
-http://localhost:8080/siteManage/reservation/manager/meetingroomList.do
 
 
 
+-- --------------------------------------------------------
+-- 호스트:                          127.0.0.1
+-- 서버 버전:                        5.7.20-log - MySQL Community Server (GPL)
+-- 서버 OS:                        Win64
+-- HeidiSQL 버전:                  9.4.0.5125
+-- --------------------------------------------------------
 
-# 회의실 예약
-UPDATE MENU_INFO SET LINK_ADDRESS = '/front/reservation/reserve/reservationGuide.do' WHERE MENU_CODE = 'userReserve'
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+-- 테이블 kric.meetingroom_file 구조 내보내기
+CREATE TABLE IF NOT EXISTS `meetingroom_file` (
+  `FILE_KEY` int(11) NOT NULL AUTO_INCREMENT COMMENT '파일고유번호',
+  `MEETINGROOM_KEY` int(11) NOT NULL COMMENT '회의실고유번호',
+  `ORDER_LEVEL` int(11) NOT NULL COMMENT '정렬순서',
+  `REAL_FILE_NAME` varchar(255) NOT NULL COMMENT '실제파일명',
+  `SAVE_FILE_NAME` varchar(255) NOT NULL COMMENT '저장파일명',
+  `FILE_PATH` varchar(255) NOT NULL COMMENT '파일경로',
+  `FILE_EXT` varchar(30) NOT NULL COMMENT '파일확장자명',
+  `FILE_SIZE` int(11) NOT NULL COMMENT '파일사이즈',
+  `FILE_DOWN_CNT` int(11) NOT NULL COMMENT '파일다운로드수',
+  `IMAGE_WIDTH_SIZE` int(11) DEFAULT NULL COMMENT '이미지가로사이즈',
+  `IMAGE_HEIGHT_SIZE` int(11) DEFAULT NULL COMMENT '이미지세로사이즈',
+  `STATUS` varchar(1) NOT NULL COMMENT '상태',
+  `REG_DATE` datetime NOT NULL COMMENT '등록일시',
+  PRIMARY KEY (`FILE_KEY`,`MEETINGROOM_KEY`),
+  KEY `FK_MEETINGROOM_TO_BOARD_FILE` (`MEETINGROOM_KEY`),
+  CONSTRAINT `FK_MEETINGROOM_TO_BOARD_FILE` FOREIGN KEY (`MEETINGROOM_KEY`) REFERENCES `meetingroom_info` (`MEETINGROOM_KEY`)
+) ENGINE=InnoDB AUTO_INCREMENT=347 DEFAULT CHARSET=utf8 COMMENT='미팅룸첨부파일정보';
+
+-- 테이블 데이터 kric.meetingroom_file:~34 rows (대략적) 내보내기
+/*!40000 ALTER TABLE `meetingroom_file` DISABLE KEYS */;
+INSERT INTO `meetingroom_file` (`FILE_KEY`, `MEETINGROOM_KEY`, `ORDER_LEVEL`, `REAL_FILE_NAME`, `SAVE_FILE_NAME`, `FILE_PATH`, `FILE_EXT`, `FILE_SIZE`, `FILE_DOWN_CNT`, `IMAGE_WIDTH_SIZE`, `IMAGE_HEIGHT_SIZE`, `STATUS`, `REG_DATE`) VALUES
+	(313, 17, 1, '23466317216_b99485ba14_o-panorama.jpg', '201712161513404995678001.jpg', '/2017/1216/', 'jpg', 925340, 0, 3568, 1784, 'Y', '2017-12-16 15:17:34'),
+	(314, 17, 2, 'abcd.jpg', '201712161513404998662002.jpg', '/2017/1216/', 'jpg', 27958, 0, 435, 318, 'Y', '2017-12-16 15:17:34'),
+	(315, 17, 3, 'image-editing-101040_960_720.jpg', '201712161513404998819003.jpg', '/2017/1216/', 'jpg', 159429, 0, 960, 480, 'Y', '2017-12-16 15:17:34'),
+	(316, 18, 1, 'abcd.jpg', '201712161513405832803001.jpg', '/2017/1216/', 'jpg', 27958, 0, 435, 318, 'Y', '2017-12-16 15:30:35'),
+	(317, 18, 2, 'image-editing-101040_960_720.jpg', '201712161513405833019002.jpg', '/2017/1216/', 'jpg', 159429, 0, 960, 480, 'Y', '2017-12-16 15:30:35'),
+	(318, 18, 3, 'img_fjords.jpg', '201712161513405833286003.jpg', '/2017/1216/', 'jpg', 37075, 0, 600, 400, 'Y', '2017-12-16 15:30:35'),
+	(319, 18, 4, 'img_lights.jpg', '201712161513405833485004.jpg', '/2017/1216/', 'jpg', 20461, 0, 600, 400, 'Y', '2017-12-16 15:30:35'),
+	(320, 19, 1, '5841762-image.jpg', '201712161513405905841001.jpg', '/2017/1216/', 'jpg', 130279, 0, 1000, 500, 'Y', '2017-12-16 15:31:52'),
+	(321, 19, 2, '23466317216_b99485ba14_o-panorama.jpg', '201712161513405906049002.jpg', '/2017/1216/', 'jpg', 925340, 0, 3568, 1784, 'Y', '2017-12-16 15:31:52'),
+	(322, 19, 3, 'abcd.jpg', '201712161513405909383003.jpg', '/2017/1216/', 'jpg', 27958, 0, 435, 318, 'Y', '2017-12-16 15:31:52'),
+	(323, 20, 1, 'image-editing-101040_960_720.jpg', '201712161513406175931001.jpg', '/2017/1216/', 'jpg', 159429, 0, 960, 480, 'N', '2017-12-16 15:36:17'),
+	(324, 20, 1, '5841762-image.jpg', '201712161513408527860001.jpg', '/2017/1216/', 'jpg', 130279, 0, 1000, 500, 'Y', '2017-12-16 16:15:38'),
+	(325, 20, 2, '23466317216_b99485ba14_o-panorama.jpg', '201712161513408528242002.jpg', '/2017/1216/', 'jpg', 925340, 0, 3568, 1784, 'Y', '2017-12-16 16:15:38'),
+	(326, 20, 3, 'abcd.jpg', '201712161513408531802003.jpg', '/2017/1216/', 'jpg', 27958, 0, 435, 318, 'Y', '2017-12-16 16:15:38'),
+	(327, 1, 1, 'meetingroom_1.jpg', '201712171513515739758001.jpg', '/2017/1217/', 'jpg', 198352, 0, 655, 383, 'Y', '2017-12-17 22:02:23'),
+	(328, 1, 2, 'meetingroom_2.jpg', '201712171513515740305002.jpg', '/2017/1217/', 'jpg', 208834, 0, 655, 383, 'Y', '2017-12-17 22:02:23'),
+	(329, 1, 3, 'meetingroom_3.jpg', '201712171513515740469003.jpg', '/2017/1217/', 'jpg', 182205, 0, 655, 383, 'Y', '2017-12-17 22:02:23'),
+	(330, 1, 4, 'meetingroom_4.jpg', '201712171513515740632004.jpg', '/2017/1217/', 'jpg', 198356, 0, 655, 383, 'Y', '2017-12-17 22:02:23'),
+	(331, 1, 5, 'meetingroom_5.jpg', '201712171513515740764005.jpg', '/2017/1217/', 'jpg', 195200, 0, 655, 383, 'Y', '2017-12-17 22:02:24'),
+	(332, 3, 1, 'meetingroom_1.jpg', '201712171513515755353006.jpg', '/2017/1217/', 'jpg', 198352, 0, 655, 383, 'Y', '2017-12-17 22:02:37'),
+	(333, 3, 2, 'meetingroom_2.jpg', '201712171513515755486007.jpg', '/2017/1217/', 'jpg', 208834, 0, 655, 383, 'Y', '2017-12-17 22:02:37'),
+	(334, 3, 3, 'meetingroom_3.jpg', '201712171513515755673008.jpg', '/2017/1217/', 'jpg', 182205, 0, 655, 383, 'Y', '2017-12-17 22:02:37'),
+	(335, 3, 4, 'meetingroom_4.jpg', '201712171513515755804009.jpg', '/2017/1217/', 'jpg', 198356, 0, 655, 383, 'Y', '2017-12-17 22:02:37'),
+	(336, 3, 5, 'meetingroom_5.jpg', '201712171513515755933010.jpg', '/2017/1217/', 'jpg', 195200, 0, 655, 383, 'Y', '2017-12-17 22:02:37'),
+	(337, 8, 1, 'meetingroom_1.jpg', '201712171513515766180011.jpg', '/2017/1217/', 'jpg', 198352, 0, 655, 383, 'Y', '2017-12-17 22:02:48'),
+	(338, 8, 2, 'meetingroom_2.jpg', '201712171513515766313012.jpg', '/2017/1217/', 'jpg', 208834, 0, 655, 383, 'Y', '2017-12-17 22:02:48'),
+	(339, 8, 3, 'meetingroom_3.jpg', '201712171513515766481013.jpg', '/2017/1217/', 'jpg', 182205, 0, 655, 383, 'Y', '2017-12-17 22:02:48'),
+	(340, 8, 4, 'meetingroom_4.jpg', '201712171513515766674014.jpg', '/2017/1217/', 'jpg', 198356, 0, 655, 383, 'Y', '2017-12-17 22:02:48'),
+	(341, 8, 5, 'meetingroom_5.jpg', '201712171513515766813015.jpg', '/2017/1217/', 'jpg', 195200, 0, 655, 383, 'Y', '2017-12-17 22:02:48'),
+	(342, 9, 1, 'meetingroom_1.jpg', '201712171513515780661016.jpg', '/2017/1217/', 'jpg', 198352, 0, 655, 383, 'Y', '2017-12-17 22:03:02'),
+	(343, 9, 2, 'meetingroom_2.jpg', '201712171513515780866017.jpg', '/2017/1217/', 'jpg', 208834, 0, 655, 383, 'Y', '2017-12-17 22:03:02'),
+	(344, 9, 3, 'meetingroom_3.jpg', '201712171513515781032018.jpg', '/2017/1217/', 'jpg', 182205, 0, 655, 383, 'Y', '2017-12-17 22:03:02'),
+	(345, 9, 4, 'meetingroom_4.jpg', '201712171513515781185019.jpg', '/2017/1217/', 'jpg', 198356, 0, 655, 383, 'Y', '2017-12-17 22:03:02'),
+	(346, 9, 5, 'meetingroom_5.jpg', '201712171513515781330020.jpg', '/2017/1217/', 'jpg', 195200, 0, 655, 383, 'Y', '2017-12-17 22:03:02');
+/*!40000 ALTER TABLE `meetingroom_file` ENABLE KEYS */;
+
+-- 테이블 kric.meetingroom_info 구조 내보내기
+CREATE TABLE IF NOT EXISTS `meetingroom_info` (
+  `MEETINGROOM_KEY` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(50) NOT NULL,
+  `TYPE` varchar(30) DEFAULT NULL,
+  `SIZE` int(3) DEFAULT NULL,
+  `MAX_CAPACITY` int(3) DEFAULT NULL,
+  `FACILITY` varchar(255) DEFAULT NULL,
+  `HOURLY_PRICE` int(8) DEFAULT NULL,
+  `PUBLISH` tinyint(1) unsigned zerofill NOT NULL DEFAULT '0',
+  `ATTACH_CNT` int(2) DEFAULT '0',
+  `REG_DATE` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `MOD_DATE` datetime DEFAULT NULL,
+  `DEL_DATE` datetime DEFAULT NULL,
+  `REG_ID` varchar(100) NOT NULL,
+  `MOD_ID` varchar(100) DEFAULT NULL,
+  `DEL_ID` varchar(100) DEFAULT NULL,
+  `STATUS` char(1) NOT NULL DEFAULT 'Y' COMMENT 'Y: 등록 D:삭제',
+  PRIMARY KEY (`MEETINGROOM_KEY`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='Meeting Room Info\r\nAdded by Karl on 2017.12.13';
+
+-- 테이블 데이터 kric.meetingroom_info:~10 rows (대략적) 내보내기
+/*!40000 ALTER TABLE `meetingroom_info` DISABLE KEYS */;
+INSERT INTO `meetingroom_info` (`MEETINGROOM_KEY`, `NAME`, `TYPE`, `SIZE`, `MAX_CAPACITY`, `FACILITY`, `HOURLY_PRICE`, `PUBLISH`, `ATTACH_CNT`, `REG_DATE`, `MOD_DATE`, `DEL_DATE`, `REG_ID`, `MOD_ID`, `DEL_ID`, `STATUS`) VALUES
+	(1, '보듬관(지하1층) 대회의실', '사각형', 15, 90, '무선마이크 2set, 유선마이크 2set, 빔프로젝트, 전자교탁, 데스크탑 1set, 화이트보드', 20000, 0, 5, '2017-12-13 21:49:35', '2017-12-17 22:02:23', NULL, 'admin', 'admin', NULL, 'Y'),
+	(2, '무럭관(지하1층) 중회의실', '원형', 10, 40, '30인치 TV', 10000, 1, 0, '2017-12-14 23:19:58', NULL, '2017-12-16 19:26:22', 'admin', NULL, 'admin', 'D'),
+	(3, '회의실 002', '사각형', 10, 10, '주요시설 없음', 10000, 0, 5, '2017-12-16 13:44:46', '2017-12-17 22:02:37', NULL, 'admin', 'admin', NULL, 'Y'),
+	(8, '회의실 004', '사각형', 14, 14, '주요시설 14', 14000, 0, 5, '2017-12-16 14:33:57', '2017-12-17 22:02:48', NULL, 'admin', 'admin', NULL, 'Y'),
+	(9, '회의실 005', '사각형', 15, 15, '주요시설 15', 15000, 0, 5, '2017-12-16 14:34:53', '2017-12-17 22:03:02', NULL, 'admin', 'admin', NULL, 'Y'),
+	(10, '회의실 006', '사각혀', 16, 16, '주요시설 16', 16000, 0, 0, '2017-12-16 14:35:51', NULL, '2017-12-16 19:28:28', 'admin', NULL, 'admin', 'D'),
+	(17, '회의실 007', '사각형', 17, 17, '주요시설 17000', 17000, 0, 0, '2017-12-16 15:17:34', NULL, NULL, 'admin', NULL, NULL, 'Y'),
+	(18, '회의실 008', '사각형', 18, 18, '주요시설 18', 18000, 0, 0, '2017-12-16 15:30:35', NULL, NULL, 'admin', NULL, NULL, 'Y'),
+	(19, '회의실 009', '사각형', 19, 19, '주요시설 19', 19000, 0, 0, '2017-12-16 15:31:52', NULL, NULL, 'admin', NULL, NULL, 'Y'),
+	(20, '회의실 10', '10', 10, 10, '주요시설 10', 10000, 0, 3, '2017-12-16 15:36:17', '2017-12-16 16:15:38', NULL, 'admin', 'admin', NULL, 'Y');
+/*!40000 ALTER TABLE `meetingroom_info` ENABLE KEYS */;
+
+-- 테이블 kric.reservation_info 구조 내보내기
+CREATE TABLE IF NOT EXISTS `reservation_info` (
+  `RESERVATION_KEY` int(11) NOT NULL AUTO_INCREMENT COMMENT '예약 키',
+  `RESERVATION_PWD` varchar(30) NOT NULL COMMENT '예약 비밀번호',
+  `NAME` varchar(20) NOT NULL COMMENT '예약자명',
+  `FIRM_NAME` varchar(30) NOT NULL COMMENT '소속(기업명)',
+  `PHONE_NUMBER_1` char(4) NOT NULL COMMENT '핸드폰번호1',
+  `STATUS` char(1) NOT NULL DEFAULT 'W' COMMENT 'C:취소 W:대기 A:승인',
+  `STATUS_TIME` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'STATUS 상태 변경 시간',
+  `PHONE_NUMBER_2` char(4) NOT NULL COMMENT '핸드폰번호2',
+  `PHONE_NUMBER_3` char(4) NOT NULL COMMENT '핸드폰번호3',
+  `EMAIL_ADDR_1` varchar(20) NOT NULL COMMENT '이메일',
+  `EMAIL_ADDR_2` varchar(20) DEFAULT NULL,
+  `EMAIL_ADDR_3` varchar(20) DEFAULT NULL,
+  `REQUEST` varchar(50) NOT NULL COMMENT '요청사항',
+  `AGREE_TERM_PERSONAL_INFO` char(1) NOT NULL COMMENT '개인정보 수집 및 이용 동의',
+  `TOTAL_PRICE` varchar(7) NOT NULL COMMENT '총가격',
+  PRIMARY KEY (`RESERVATION_KEY`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+
+-- 테이블 데이터 kric.reservation_info:~13 rows (대략적) 내보내기
+/*!40000 ALTER TABLE `reservation_info` DISABLE KEYS */;
+INSERT INTO `reservation_info` (`RESERVATION_KEY`, `RESERVATION_PWD`, `NAME`, `FIRM_NAME`, `PHONE_NUMBER_1`, `STATUS`, `STATUS_TIME`, `PHONE_NUMBER_2`, `PHONE_NUMBER_3`, `EMAIL_ADDR_1`, `EMAIL_ADDR_2`, `EMAIL_ADDR_3`, `REQUEST`, `AGREE_TERM_PERSONAL_INFO`, `TOTAL_PRICE`) VALUES
+	(1, '1234', '정경수', '비트나인', '010', 'W', '2017-12-17 23:43:48', '3715', '3058', 'ASD@NATE.COM', NULL, NULL, '별도의 요청사항 없음', '1', ''),
+	(2, '1234', '정경수', '비트나인', '010', 'W', '2017-12-17 23:43:48', '3715', '3058', 'ASD@NATE.COM', NULL, NULL, '별도없음', '1', ''),
+	(4, '1234', '테스터1', '테스터2', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'abd', 'daum.net', '', '1234', '1', '80000'),
+	(5, '1234', '테스터1', '테스터2', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'be', 'naver.com', '', '1111111', '1', '80000'),
+	(6, '1234', '테스터1', '파주', '010', 'W', '2017-12-17 23:43:48', '2222', '3333', 'be', 'daum.net', '', '111', '1', '110000'),
+	(7, '1234', '류수진', '지', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'abc', 'naver.com', '', '1234', '1', '56000'),
+	(8, '1234', '테스터1', '테스터2', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'be', 'daum.net', '', '1234', '1', '60000'),
+	(9, '1234', '테스터1', '테스터2', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'be', 'naver.com', '', '1234', '1', '80000'),
+	(11, '1234', '김대영', '파주', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'be', 'naver.com', '', '1234', '1', '40000'),
+	(12, '1234', '김동률', '아무', '010', 'W', '2017-12-17 23:43:48', '1111', '3333', 'abd', 'daum.net', '', '1234', '1', '20000'),
+	(14, '1234', '이동길', '(주)여기', '010', 'W', '2017-12-17 23:43:48', '2312', '1231', 'ab', 'daum.net', '', '123123123', '1', '40000'),
+	(15, '1234', '정경수', '(주)여기', '010', 'W', '2017-12-17 23:43:48', '1234', '1234', '1234', 'naver.com', '', '123', '', '20000'),
+	(16, '1234', '정경수', '(주)여기', '010', 'W', '2017-12-17 23:43:48', '1234', '1234', '1234', 'daum.net', '', '1234', '', '40000');
+/*!40000 ALTER TABLE `reservation_info` ENABLE KEYS */;
+
+-- 테이블 kric.reservation_mapp 구조 내보내기
+CREATE TABLE IF NOT EXISTS `reservation_mapp` (
+  `RESERVATION_KEY` int(11) NOT NULL,
+  `MEETINGROOM_KEY` int(11) NOT NULL,
+  `RESERVATION_DATE` date NOT NULL,
+  `RESERVATION_TIME` char(2) NOT NULL COMMENT '예약시작시간부터 한시간 단위 EX) 08 = 08~09시, 09 = 09~10시, 14 =14~15시',
+  `STATUS` char(1) NOT NULL DEFAULT 'W' COMMENT 'C:취소 W:대기 A:승인 (현재사용X)',
+  `REG_TIME` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `MOD_TIME` datetime DEFAULT NULL,
+  `CANCEL_TIME` datetime DEFAULT NULL,
+  UNIQUE KEY `MEETINGROOM_KEY_RESERVATION_DATE_RESERVATION_TIME` (`MEETINGROOM_KEY`,`RESERVATION_DATE`,`RESERVATION_TIME`),
+  KEY `FK1_RESERVATION_KEY` (`RESERVATION_KEY`),
+  CONSTRAINT `FK1_RESERVATION_KEY` FOREIGN KEY (`RESERVATION_KEY`) REFERENCES `reservation_info` (`RESERVATION_KEY`),
+  CONSTRAINT `FK2_MEETINGROOM_KEY` FOREIGN KEY (`MEETINGROOM_KEY`) REFERENCES `meetingroom_info` (`MEETINGROOM_KEY`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 테이블 데이터 kric.reservation_mapp:~50 rows (대략적) 내보내기
+/*!40000 ALTER TABLE `reservation_mapp` DISABLE KEYS */;
+INSERT INTO `reservation_mapp` (`RESERVATION_KEY`, `MEETINGROOM_KEY`, `RESERVATION_DATE`, `RESERVATION_TIME`, `STATUS`, `REG_TIME`, `MOD_TIME`, `CANCEL_TIME`) VALUES
+	(15, 1, '2017-12-13', '13', 'W', '2017-12-17 22:55:19', NULL, NULL),
+	(5, 1, '2017-12-14', '15', 'W', '2017-12-17 21:11:30', NULL, NULL),
+	(5, 1, '2017-12-14', '16', 'W', '2017-12-17 21:11:30', NULL, NULL),
+	(5, 1, '2017-12-14', '17', 'W', '2017-12-17 21:11:30', NULL, NULL),
+	(5, 1, '2017-12-14', '18', 'W', '2017-12-17 21:11:30', NULL, NULL),
+	(1, 1, '2017-12-17', '08', 'W', '2017-12-17 13:02:02', NULL, NULL),
+	(1, 1, '2017-12-17', '09', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '10', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '11', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '12', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '13', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '14', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '15', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '16', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '17', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(1, 1, '2017-12-17', '18', 'W', '2017-12-17 13:02:22', NULL, NULL),
+	(4, 1, '2017-12-18', '09', 'W', '2017-12-17 21:10:18', NULL, NULL),
+	(4, 1, '2017-12-18', '10', 'W', '2017-12-17 21:10:18', NULL, NULL),
+	(4, 1, '2017-12-18', '11', 'W', '2017-12-17 21:10:18', NULL, NULL),
+	(4, 1, '2017-12-18', '12', 'W', '2017-12-17 21:10:18', NULL, NULL),
+	(9, 1, '2017-12-20', '10', 'W', '2017-12-17 21:55:12', NULL, NULL),
+	(9, 1, '2017-12-20', '11', 'W', '2017-12-17 21:55:12', NULL, NULL),
+	(9, 1, '2017-12-20', '12', 'W', '2017-12-17 21:55:12', NULL, NULL),
+	(9, 1, '2017-12-20', '13', 'W', '2017-12-17 21:55:12', NULL, NULL),
+	(8, 1, '2017-12-20', '15', 'W', '2017-12-17 21:53:26', NULL, NULL),
+	(8, 1, '2017-12-20', '16', 'W', '2017-12-17 21:53:26', NULL, NULL),
+	(8, 1, '2017-12-20', '17', 'W', '2017-12-17 21:53:26', NULL, NULL),
+	(12, 1, '2017-12-20', '18', 'W', '2017-12-17 22:27:42', NULL, NULL),
+	(14, 1, '2017-12-21', '08', 'W', '2017-12-17 22:45:41', NULL, NULL),
+	(14, 1, '2017-12-21', '09', 'W', '2017-12-17 22:45:41', NULL, NULL),
+	(11, 1, '2017-12-25', '10', 'W', '2017-12-17 22:14:37', NULL, NULL),
+	(11, 1, '2017-12-25', '11', 'W', '2017-12-17 22:14:37', NULL, NULL),
+	(16, 1, '2017-12-27', '12', 'W', '2017-12-17 22:57:35', NULL, NULL),
+	(16, 1, '2017-12-27', '13', 'W', '2017-12-17 22:57:35', NULL, NULL),
+	(6, 3, '2017-12-20', '08', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '09', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '10', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '11', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '12', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '13', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '14', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '15', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '16', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '17', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(6, 3, '2017-12-20', '18', 'W', '2017-12-17 21:12:16', NULL, NULL),
+	(7, 8, '2017-12-20', '12', 'W', '2017-12-17 21:50:54', NULL, NULL),
+	(7, 8, '2017-12-20', '13', 'W', '2017-12-17 21:50:54', NULL, NULL),
+	(7, 8, '2017-12-20', '14', 'W', '2017-12-17 21:50:54', NULL, NULL),
+	(7, 8, '2017-12-20', '15', 'W', '2017-12-17 21:50:54', NULL, NULL),
+	(2, 20, '2017-12-20', '10', 'W', '2017-12-17 13:09:06', NULL, NULL);
+/*!40000 ALTER TABLE `reservation_mapp` ENABLE KEYS */;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
