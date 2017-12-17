@@ -3,11 +3,230 @@
 <sqlMap namespace="RESERVE">
 	
     <typeAlias alias="reserve" type="com.module.reserve.dto.ReserveDto"/>
+    
+    <sql id="reserveColumn">
+    	RESERVATION_KEY
+    ,	MEETINGROOM_KEY
+    ,	RESERVATION_DATE
+    ,	RESERVATION_BEGIN_TIME
+    ,	RESERVATION_END_TIME
+    ,	RESERVATION_PWD
+   	,	NAME
+   	,	FIRM_NAME
+ 	,   STATUS
+ 	,   STATUS_TIME
+   	,	PHONE_NUMBER_1
+   	,	PHONE_NUMBER_2
+   	,	PHONE_NUMBER_3
+   	,	EMAIL_ADDR		
+   	,	REQUEST		
+   	,	AGREE_TERM_PERSONAL_INFO
+   	,	REG_TIME
+   	,	MOD_TIME
+   	, 	CALCEL_TIME
+    </sql>
 
+	<select id="getMeetingroomStatusList" resultClass="reserve">
+	/* RESERVE.getMeetingroomStatusList */
 	
+	SELECT MI.MEETINGROOM_KEY
+		 , MI.NAME MEETINGROOM_NAME
+		 , IFNULL(AVAIL.AVAILABILITY, "1") ROOM_AVAILABILITY
+	FROM MEETINGROOM_INFO AS MI
+	LEFT OUTER JOIN (SELECT CASE WHEN COUNT(MEETINGROOM_KEY) > 10 THEN '0' ELSE '1' END AVAILABILITY
+					  	  , MEETINGROOM_KEY
+					 FROM RESERVATION_MAPP
+					 WHERE RESERVATION_DATE = #reservation_date#
+					 GROUP BY MEETINGROOM_KEY, RESERVATION_DATE) AVAIL ON AVAIL.MEETINGROOM_KEY = MI.MEETINGROOM_KEY
+	WHERE MI.STATUS ='Y'
+	ORDER BY MEETINGROOM_KEY
+	</select>
 
+
+	<select id="getDateList" resultClass="reserve">
+	/* RESERVE.getDateList */
+	
+	SELECT MONTH_LIST.DATES AS RESERVATION_DATE
+		 , DATE_FORMAT(MONTH_LIST.DATES, '%Y') AS RESERVATION_YEAR
+	 	 , DATE_FORMAT(MONTH_LIST.DATES, '%m') AS RESERVATION_MONTH
+	  	 , DATE_FORMAT(MONTH_LIST.DATES, '%d') AS RESERVATION_DAY
+	  	 , CASE DAYOFWEEK(MONTH_LIST.DATES)
+				WHEN 1 THEN '(일)'
+  	 	  	 	WHEN 2 THEN '(월)'
+  	 	  	 	WHEN 3 THEN '(화)'
+  	 	  	 	WHEN 4 THEN '(수)'
+  	 	  	 	WHEN 5 THEN '(목)'
+  	 	  	 	WHEN 6 THEN '(금)'
+  	 	  	 	WHEN 7 THEN '(토)'
+  	 	  	 	END RESERVATION_DAYOFWEEK
+		 , IFNULL(AVAIL.AVAILABILITY, "1") DATE_AVAILABILITY
+		 , CASE WHEN #reservation_date# = MONTH_LIST.DATES THEN '1'
+		 	    ELSE '0' END SELECTED_DATE
+	FROM
+	(SELECT ADDDATE(IFNULL(DATE_FORMAT(DATE(#reservation_date#), '%Y-%m-01'), DATE_FORMAT(NOW() ,'%Y-%m-01')), T3.I*1000 + T2.I*100 + T1.I*10 + T0.I) DATES
+	 FROM (SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T0,
+	      (SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T1,
+	      (SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T2,
+	      (SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T3) MONTH_LIST
+	 LEFT OUTER JOIN
+	(SELECT CASE WHEN COUNT(MEETINGROOM_KEY) > 10 THEN '0' ELSE '1' END AVAILABILITY
+		  , MEETINGROOM_KEY
+		  , RESERVATION_DATE
+			FROM RESERVATION_MAPP
+			WHERE MEETINGROOM_KEY = #meetingroom_key#
+			GROUP BY MEETINGROOM_KEY, RESERVATION_DATE) AVAIL ON AVAIL.RESERVATION_DATE = MONTH_LIST.DATES
+	 WHERE MONTH_LIST.DATES BETWEEN IFNULL(DATE_FORMAT(DATE(#reservation_date#), '%Y-%m-0'), DATE_FORMAT(NOW() ,'%Y-%m-01')) AND IFNULL(DATE_FORMAT(DATE(#reservation_date#), '%Y-%m-32'), DATE_FORMAT(NOW() ,'%Y-%m-32'))
+	 ORDER BY MONTH_LIST.DATES
+	</select>
  
+	<select id="getTimeList" resultClass="reserve">
+	/* RESERVE.getTimeList */
+	
+	SELECT TIME_LIST.RESERVATION_TIME
+	     , TIME_LIST.RESERVATION_TERM
+		 , CASE WHEN AVAIL.RESERVATION_TIME THEN '0' ELSE '1' END TIME_AVAILABILITY
+	FROM (SELECT LPAD(T.I, 2, '0') RESERVATION_TIME
+		  	   , CONCAT_WS("", LPAD(T.I, 2, '0'),":00","~",LPAD(T.I+1, 2, '0'),":00") RESERVATION_TERM
+	 	  FROM (SELECT 8 I UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16 UNION SELECT 17 UNION SELECT 18) T) TIME_LIST
+	 LEFT OUTER JOIN (SELECT RESERVATION_TIME
+					  FROM RESERVATION_MAPP
+					  WHERE RESERVATION_DATE = #reservation_date#
+					  AND   MEETINGROOM_KEY = #meetingroom_key#
+					  AND   (STATUS = 'W' OR STATUS = 'A')) AVAIL ON AVAIL.RESERVATION_TIME = TIME_LIST.RESERVATION_TIME
+	 ORDER BY TIME_LIST.RESERVATION_TIME			
+	
+	</select>
+ 
+	<select id="getReserveRoomInfo" resultClass="reserve">
+	/* RESERVE.getReserveRoomInfo */
+		
+	SELECT NAME
+	     , HOURLY_PRICE
+	FROM MEETINGROOM_INFO
+	WHERE MEETINGROOM_KEY = #reservation_date#
+	AND   STATUS = 'Y'
+	
+	</select>
     
+    <insert id="reserveSaveInfo">
+    /* RESERVE.reserveSaveInfo */
     
+    INSERT INTO RESERVATION_INFO(
+    	RESERVATION_PWD
+    ,	NAME
+    ,	FIRM_NAME
+    ,	PHONE_NUMBER_1
+   	,	PHONE_NUMBER_2
+   	,	PHONE_NUMBER_3
+   	,	EMAIL_ADDR_1
+   	,	EMAIL_ADDR_2
+   	,	EMAIL_ADDR_3		
+   	,	REQUEST
+   	,	AGREE_TERM_PERSONAL_INFO
+   	,	TOTAL_PRICE
+   	,   STATUS
+   	,   STATUS_TIME
+    ) VALUES (
+    	#reservation_pwd#          
+    ,	#name#                     
+    ,	#firm_name#                
+    ,	#phone_number_1#           
+    ,	#phone_number_2#           
+    ,	#phone_number_3#           
+    ,	#email_addr_1#             
+    ,	#email_addr_2#             
+    ,	#email_addr_3#		     
+    ,   #request#                  
+    ,   #agree_term_personal_info# 
+    ,   #total_price#    
+    ,   'W'    
+    ,   NOW()      
+    )
+    
+	   	<selectKey resultClass="int" >
+		SELECT @@IDENTITY AS RESERVATION_KEY
+		</selectKey>
+    </insert>
+    
+    <insert id="reserveSaveMapp">
+    /* RESERVE.reserveSaveMapp */
+    
+    INSERT INTO RESERVATION_MAPP(
+    	RESERVATION_KEY
+    ,	MEETINGROOM_KEY
+    ,	RESERVATION_DATE
+    ,	RESERVATION_TIME
+   	,	STATUS
+   	,	REG_TIME
+    ) VALUES (
+    	#reservation_key#          
+    ,	#meetingroom_key#                     
+    ,	#reservation_date#                
+    ,	#reservation_time#           
+    ,	'W'
+    ,   now()           
+    )
+    
+    </insert>
+    
+   
+	<select id="getReservationResult" resultClass="reserve">
+	/* RESERVE.getReservationResult */
+	
+	SELECT RI.RESERVATION_KEY
+	     , RI.NAME
+	     , RI.FIRM_NAME
+	     , RI.PHONE_NUMBER_1
+	     , RI.PHONE_NUMBER_2
+	     , RI.PHONE_NUMBER_3
+	     , RI.EMAIL_ADDR_1
+	  	 , RI.REQUEST
+	  	 , RI.STATUS
+	  	 , RI.STATUS_TIME
+	     , IFNULL(RI.EMAIL_ADDR_2, RI.EMAIL_ADDR_3) EMAIL_ADDR_2
+	     , IFNULL(RI.EMAIL_ADDR_3, RI.EMAIL_ADDR_2) EMAIL_ADDR_3
+	     , MI.NAME MEETINGROOM_NAME
+	     , RI.TOTAL_PRICE
+	     , RM.RESERVATION_DATE
+	     , RM.RESERVATION_TIME	  
+	     , CONCAT_WS("",RM.RESERVATION_TIME, ":00 ~ ", RM.RESERVATION_TIME+1, ":00") RESERVATION_TERM
+	  	 , ( SELECT CONCAT_WS("",FILE_PATH, SAVE_FILE_NAME)
+			 FROM MEETINGROOM_FILE
+			 WHERE MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+		     AND   STATUS = 'Y'
+			 LIMIT 1) AS IMAGE	  
+	FROM RESERVATION_INFO AS RI
+	INNER JOIN RESERVATION_MAPP AS RM ON RM.RESERVATION_KEY = RI.RESERVATION_KEY
+	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+	WHERE RI.RESERVATION_KEY = #reservation_key#	
+	AND   RI.NAME = #name#
+	AND   RI.RESERVATION_PWD = #reservation_pwd#
+	</select>  
+    
+    <select id="getReservationList" resultClass="reserve">
+	/* RESERVE.getReservationList */
+	
+	SELECT RI.RESERVATION_KEY
+	     , RI.NAME
+	     , RI.FIRM_NAME
+	     , RI.PHONE_NUMBER_1
+	     , RI.PHONE_NUMBER_2
+	     , RI.PHONE_NUMBER_3
+	     , RI.EMAIL_ADDR_1
+	  	 , RI.REQUEST
+	  	 , RI.STATUS
+	  	 , CASE STATUS WHEN 'Y' THEN '승인'
+	  	 	           WHEN 'W' THEN '신청'
+	  	 	           WHEN 'R' THEN '반려'
+	  	 	END STATUS_NAME
+	  	 , RI.STATUS_TIME
+	     , IFNULL(RI.EMAIL_ADDR_2, RI.EMAIL_ADDR_3) EMAIL_ADDR_2
+	     , IFNULL(RI.EMAIL_ADDR_3, RI.EMAIL_ADDR_2) EMAIL_ADDR_3
+	     , RI.TOTAL_PRICE
+	     , (SELECT NAME FROM MEETINGROOM_INFO MI INNER JOIN RESERVATION_MAPP AS RM ON RM.MEETINGROOM_KEY = MI.MEETINGROOM_KEY WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) MEETINGROOM_NAME
+	     , (SELECT RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) RESERVATION_DATE
+	     , (SELECT DATE_FORMAT(REG_TIME,'%Y-%m-%d') FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1)  REG_TIME
+	FROM RESERVATION_INFO AS RI
+	</select>  
     
 </sqlMap>

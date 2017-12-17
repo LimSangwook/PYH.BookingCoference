@@ -14,7 +14,7 @@ public interface MeetingroomService {
 	/**
 	 * 회의실 목록 조회
 	 * */
-	public List<MeetingroomDto> getMeetingroomList(MeetingroomDto meetingroom) throws Exception;
+	public List<MeetingroomDto> getMeetingroomList() throws Exception;
 	
 	/**
 	 * 회의실 상세조회

@@ -26,8 +26,8 @@ public class MeetingroomServiceImpl implements MeetingroomService{
 		
 	@SuppressWarnings("unchecked")
 	@Override
-	public  List<MeetingroomDto> getMeetingroomList(MeetingroomDto meetingroom) throws Exception {
-		List<MeetingroomDto> meetingroomList = (List<MeetingroomDto>) commonDao.queryForObjectList("MEETINGROOM.getMeetingroomList", meetingroom);
+	public  List<MeetingroomDto> getMeetingroomList() throws Exception {
+		List<MeetingroomDto> meetingroomList = (List<MeetingroomDto>) commonDao.queryForObjectList("MEETINGROOM.getMeetingroomList");
 		
 		for (int i = 0; i < meetingroomList.size(); i++) {
 			String meetingroomKey = meetingroomList.get(i).getMeetingroom_key();

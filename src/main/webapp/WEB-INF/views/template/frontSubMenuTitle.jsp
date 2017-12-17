@@ -3,4 +3,5 @@
 
 <div class="sub_title_section">
 	<h2><c:out value="${depth2MenuInfo.menu_name}"/></h2>
+	<h2><c:out value="${depth2MenuInfo.link_address}"/></h2>
 </div>

@@ -50,7 +50,7 @@ public class MeetingroomController extends CommonWebUtils{
 		ModelAndView mav = new ModelAndView("siteManage/meetingroom/meetingroomList");
 		try {
 			meetingroom.setSearch_type(StringUtils.equals("manager", (String)request.getAttribute("menuCode"))?"admin":"member");
-			mav.addObject("result", meetingroomService.getMeetingroomList(meetingroom));
+			mav.addObject("result", meetingroomService.getMeetingroomList());
 			mav.addObject("theForm", meetingroom);
 			mav.addObject("pageNavigation", PagingUtil.printPageNavi(meetingroom, getParameter(request,"meetingroomList.do?","meetingroom_id|page")));
 			

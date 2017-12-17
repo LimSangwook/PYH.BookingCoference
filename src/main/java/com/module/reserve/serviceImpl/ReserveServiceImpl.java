@@ -2,12 +2,18 @@ package com.module.reserve.serviceImpl;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.common.dao.CommonDao;
+import com.common.util.CommonUtils;
+import com.common.util.CommonWebUtils;
+import com.module.reserve.dto.ReserveDateDto;
 import com.module.reserve.dto.ReserveDto;
 import com.module.reserve.service.ReserveService;
+import com.module.user.dto.UserDto;
 
 @Service("reserveService")
 public class ReserveServiceImpl implements ReserveService{
@@ -15,44 +21,50 @@ public class ReserveServiceImpl implements ReserveService{
 	@Autowired
 	private CommonDao commonDao;
 	
-	@Override
-	public void insertReserveInfo(ReserveDto reserve) throws Exception {
-		// 포럼/박람회 기본정보 등록
-		int reserveKey = (Integer)commonDao.insert("RESERVE.insertReserveInfo", reserve);
-		reserve.setReserve_key(String.valueOf(reserveKey));
-		
-		// 상세정보 등록 (개요 및 일정, 포럼프로그램, 전시장 소개, 문화공연행사)
-		commonDao.insert("RESERVE.insertReserveCont", reserve);
-	}
-	
-	@Override
-	public void updateReserveInfo(ReserveDto reserve) throws Exception {
-		// 포럼/박람회 기본정보 변경
-		commonDao.update("RESERVE.updateReserveInfo", reserve);
-		// 상세정보 등록 (개요 및 일정, 포럼프로그램, 전시장 소개, 문화공연행사)
-		commonDao.insert("RESERVE.insertReserveCont", reserve);	
-	}
-	
-	@Override
-	public void deleteReserveInfo(ReserveDto reserve) throws Exception {
-		commonDao.update("RESERVE.deleteReserveInfo", reserve);
-	}	
-	
-	@Override
-	public ReserveDto getReserveInfo(String reserveKey) throws Exception {
-		return (ReserveDto)commonDao.queryForObject("RESERVE.getReserveInfo", reserveKey);
-	}
-	
-	@Override
-	public ReserveDto getReserveActiveInfo() throws Exception {
-		return (ReserveDto)commonDao.queryForObject("RESERVE.getReserveActiveInfo");
-	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<ReserveDto> getReserveList(ReserveDto reserve) throws Exception {		
-		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReserveList", reserve);
+	public List<ReserveDto> getMeetingroomStatusList(ReserveDto reserve) throws Exception {		
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getMeetingroomStatusList", reserve);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getDateList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getDateList", reserve);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getTimeList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getTimeList", reserve);	
+	}
 
+	public ReserveDto getReserveRoomInfo(ReserveDto reserve) throws Exception {
+		return (ReserveDto)commonDao.queryForObject("RESERVE.getReserveRoomInfo", reserve);
+	}
+	
+	public int reserveSave(ReserveDto reserve) throws Exception {	
+		if (reserve.getAgree_term_personal_info() != null && "on".equals(reserve.getAgree_term_personal_info())) {
+			reserve.setAgree_term_personal_info("1");
+		}
+		
+		int reservationKey = (Integer)commonDao.insert("RESERVE.reserveSaveInfo", reserve);
+		reserve.setReservation_key(String.valueOf(reservationKey));
+		
+		for (int i = 0; i < reserve.getReservation_times().length; i++){
+			reserve.setReservation_time(reserve.getReservation_times()[i]);
+			commonDao.insert("RESERVE.reserveSaveMapp", reserve);
+		}			
+		
+		return reservationKey;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getReservationResult(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationResult", reserve);	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getReservationList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationList", reserve);	
+	}
 }

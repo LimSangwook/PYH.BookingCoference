@@ -53,3 +53,7 @@ update menu_info set LINK_ADDRESS = '/reservation/manager/meetingroomList.do' wh
 http://localhost:8080/siteManage/reservation/manager/meetingroomList.do
 
 
+
+
+# 회의실 예약
+UPDATE MENU_INFO SET LINK_ADDRESS = '/front/reservation/reserve/reservationGuide.do' WHERE MENU_CODE = 'userReserve'
