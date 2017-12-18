@@ -77,6 +77,9 @@ public class ReserveDto extends BaseForm{
 	/* 총가격 */
 	private String total_price;
 	
+	/* godtkaud */
+	private String event_name;
+	
 	
 	private String reservation_year;
 	
@@ -379,6 +382,14 @@ public class ReserveDto extends BaseForm{
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public String getEvent_name() {
+		return event_name;
+	}
+
+	public void setEvent_name(String event_name) {
+		this.event_name = event_name;
 	}	
 	
 	

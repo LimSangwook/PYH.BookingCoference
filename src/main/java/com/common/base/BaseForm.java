@@ -41,6 +41,11 @@ public class BaseForm extends BaseObject implements Cloneable {
 	private String search_year;
 	private String search_month;
 	
+	private String search_name;
+	private String srh_smonth;
+	private String srh_emonth;
+	private String srh_state;
+	
 	/* 파일정보 */
 	private String[] file;
 	
@@ -251,4 +256,30 @@ public class BaseForm extends BaseObject implements Cloneable {
 			return null;
 		}
 	}
+	public String getSearch_name() {
+		return search_name;
+	}
+	public void setSearch_name(String search_name) {
+		this.search_name = search_name;
+	}
+	public String getSrh_smonth() {
+		return srh_smonth;
+	}
+	public void setSrh_smonth(String srh_smonth) {
+		this.srh_smonth = srh_smonth;
+	}
+	public String getSrh_emonth() {
+		return srh_emonth;
+	}
+	public void setSrh_emonth(String srh_emonth) {
+		this.srh_emonth = srh_emonth;
+	}
+	public String getSrh_state() {
+		return srh_state;
+	}
+	public void setSrh_state(String srh_state) {
+		this.srh_state = srh_state;
+	}
+	
+	
 }

@@ -4,12 +4,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.common.dao.CommonDao;
 import com.common.util.CommonUtils;
 import com.common.util.CommonWebUtils;
+import com.common.util.JProperties;
+import com.common.util.StringEncrypter;
 import com.module.reserve.dto.ReserveDateDto;
 import com.module.reserve.dto.ReserveDto;
 import com.module.reserve.service.ReserveService;
@@ -65,6 +68,21 @@ public class ReserveServiceImpl implements ReserveService{
 	
 	@SuppressWarnings("unchecked")
 	public List<ReserveDto> getReservationList(ReserveDto reserve) throws Exception {
-		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationList", reserve);	
+		List<ReserveDto> result = null;
+		int totalCount = (Integer)commonDao.queryForObject("RESERVE.getRserveTotalCount", reserve);
+		if(totalCount > 0){
+			result = (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationList", reserve);
+			reserve.setTotal_count(totalCount);
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> reservationView(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.reservationView", reserve);
+	}
+	
+	public void reserveUpdate(ReserveDto reserve) throws Exception {
+		commonDao.update("RESERVE.reserveUpdate", reserve);
 	}
 }

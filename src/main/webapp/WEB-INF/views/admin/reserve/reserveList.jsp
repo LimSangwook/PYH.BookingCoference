@@ -9,12 +9,12 @@
 
 <fieldset>
 <legend></legend>
-<form action="#">
+<form:form commandName="theForm" action="userList.do" method="get">
 	<div class="search_wrap search_wrap3">
 		<ul>
 			<li class=" title100">
 				<span class="title">회의실</span>
-				<select name="">
+				<form:select path="search_column" title="검색구분 선택">
 					<option value="1">지하대회의실</option>
 					<option value="2">3층소회의실</option>
 					<option value="3">동아리실1</option>
@@ -22,28 +22,28 @@
 					<option value="5">동아리실3</option>
 					<option value="6">동아리실4</option>
 					<option value="7">동아리실5</option>
-				</select>
+			</form:select>
 			</li>
 			<li class=" title100">
 				<span class="title">예약자명</span>
-				<input type="text" name="srh_name" title="예약자명 입력" class="wid100">
+				<form:input path="search_name" title="예약자명 입력" cssClass="wid100"/>				
 			</li>
 			<li class=" title100">
 				<span class="title">사용일자</span>
-				<input type="text" name="srh_smonth" title="검색어 입력" class="wid100"> ~ <input type="text" name="srh_emonth" title="검색어 입력" class="wid100"><!-- 년, 월만 입력할 수 있는 api -->
+				<form:input path="srh_smonth" title="검색어 입력" cssClass="wid100"/>	~ <form:input path="srh_emonth" title="검색어 입력" cssClass="wid100"/>
 			</li>
 			<li class=" title100">
 				<span class="title">예약현황</span>
-				<input type="radio" name="srh_state" id="srh_state1"> <label for="srh_state1">전체</label>&nbsp;&nbsp;
-				<input type="radio" name="srh_state" id="srh_state2"> <label for="srh_state2">신청</label>&nbsp;&nbsp;
-				<input type="radio" name="srh_state" id="srh_state3"> <label for="srh_state3">승인</label>&nbsp;&nbsp;
-				<input type="radio" name="srh_state" id="srh_state4"> <label for="srh_state4">반려</label>
+				<form:radiobutton path="srh_state" id="srh_state1" value="ALL"/> <label for="srh_state1">전체</label>&nbsp;&nbsp;
+				<form:radiobutton path="srh_state" id="srh_state2" value="W"/> <label for="srh_state2">신청</label>&nbsp;&nbsp;
+				<form:radiobutton path="srh_state" id="srh_state3" value="Y"/> <label for="srh_state3">승인</label>&nbsp;&nbsp;
+				<form:radiobutton path="srh_state" id="srh_state4" value="R"/> <label for="srh_state4">반려</label>
 			</li>
 		</ul>
 
 		<a href="#" class="btn inverse btn_small"><span class="ico ico_search"></span>검색</a>
 	</div><!-- //search_wrap -->
-</form>
+</form:form>
 </fieldset>
 
 <div class="clearfix">
@@ -71,7 +71,7 @@
 		<tr>
 				<td>${reservation.reservation_key}</td>
 				<td>${reservation.meetingroom_name}</td>
-				<td><a href="reservation_view.html">${reservation.name}</a></td>
+				<td><a href="reserveView.do?reservation_key=${reservation.reservation_key}">${reservation.name}</a></td>
 				<td>-</td>
 				<td>${reservation.reservation_date}</td>
 				<td>${reservation.reg_time}</td>
@@ -89,21 +89,8 @@
 </table><!-- //table_basic -->
 
 <!-- 페이지 -->
- <div class="clearfix">
-	<div class="pagenate_wrap float_left">
-		<ul class="pagenation">
-			<a href="#" class="ico ico_arrow_prev">이전</a>
-			<a href="#">1</a>
-			<span>2</span>
-			<a href="#">3</a>
-			<a href="#">4</a>
-			<a href="#">5</a>
-			<a href="#">6</a>
-			<a href="#">7</a>
-			<a href="#">8</a>
-			<a href="#">9</a>
-			<a href="#">10</a>
-			<a href="#" class="ico ico_arrow_next">다음</a>
-		</ul>
-	</div><!-- //pagenate_wrap -->
-</div>
+<div class="pagenate_wrap float_left">
+	<ul class="pagenation">
+		<c:out value="${pageNavigation}" escapeXml="false"/>
+	</ul>
+</div><!-- //pagenate_wrap -->

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.common.util.CommonWebUtils;
+import com.common.util.PagingUtil;
 import com.module.meetingroom.dto.MeetingroomDto;
 import com.module.meetingroom.service.MeetingroomService;
 import com.module.reserve.dto.ReserveDto;
@@ -71,8 +73,12 @@ public class ReserveController extends CommonWebUtils{
 		
 		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveList");
 		try {
+			reserve.setSearch_type(StringUtils.equals("adminManage", (String)request.getAttribute("menuCode"))?"admin":"member");
 			List<ReserveDto> reservationList = reserveService.getReservationList(reserve);
-			mav.addObject("reservationList", reservationList);			
+			mav.addObject("theForm", reserve);			
+			mav.addObject("reservationList", reservationList);
+			mav.addObject("defaultParameter", getParameter(request,"&","meetingroom_key|order_type|order_column"));
+			mav.addObject("pageNavigation", PagingUtil.printPageNavi(reserve, getParameter(request,"reserveList.do?","reservationkey|page")));
 			
 		} catch (Exception e) {
 			if(log.isDebugEnabled())log.debug(e.toString());
@@ -291,4 +297,60 @@ public class ReserveController extends CommonWebUtils{
 		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveStatusLogin()");
 		return mav;
 	}
+	
+	/**
+	 * 예약 현황보기
+	 * @param request
+	 * @param ReserveDto 
+	 * @return ModelAndView
+	 * @throws Exception
+	 */	
+	@RequestMapping("/siteManage/**/reserveView")
+	public ModelAndView reserveView(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveView()");
+		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveView");
+		
+		try {	
+			List<ReserveDto> result = reserveService.reservationView(reserve);
+			mav.addObject("reserveList", result);
+			mav.addObject("reserveInfo", result.get(0));
+			
+		} catch (Exception e) {
+			if(log.isDebugEnabled())log.debug(e.toString());
+			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
+		}		
+		
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveView()");
+		return mav;
+	}
+	
+	/**
+	 * 예약 현황보기
+	 * @param request
+	 * @param ReserveDto 
+	 * @return ModelAndView
+	 * @throws Exception
+	 */	
+	@RequestMapping("/siteManage/**/reserveUpdate")
+	public ModelAndView reserveUpdate(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveUpdate()");
+		
+		ModelAndView mav = new ModelAndView();
+		String returnPage = "";
+
+		try {
+			reserveService.reserveUpdate(reserve);
+			returnPage = "reserveView.do?reservation_key="+reserve.getReservation_key();
+			
+			redirectView(mav, "", returnPage);
+		} catch (Exception e) {
+			if(log.isDebugEnabled())log.debug(e.toString());
+			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
+		}		
+		
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveUpdate()");
+		return mav;
+	}
+	
+	
 }

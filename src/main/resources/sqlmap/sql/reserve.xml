@@ -26,6 +26,24 @@
    	, 	CALCEL_TIME
     </sql>
 
+	<sql id="reverseRearch">		
+		<isNotEmpty prepend="AND" property="search_column">
+    		MEETINGROOM_KEY = #search_column#
+    	</isNotEmpty>
+		<isNotEmpty prepend="AND" property="search_name">
+    		NAME = #search_name#
+    	</isNotEmpty>
+		<isNotEmpty prepend="AND" property="srh_smonth">
+    		RESERVATION_DATE &gt;= #srh_smonth#
+    	</isNotEmpty>
+		<isNotEmpty prepend="AND" property="srh_emonth">
+    		RESERVATION_DATE &lt;= #srh_emonth#
+    	</isNotEmpty>
+		<isNotEmpty prepend="AND" property="srh_state">
+    		STATUS = #srh_state#
+    	</isNotEmpty>
+	</sql>
+
 	<select id="getMeetingroomStatusList" resultClass="reserve">
 	/* RESERVE.getMeetingroomStatusList */
 	
@@ -227,6 +245,63 @@
 	     , (SELECT RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) RESERVATION_DATE
 	     , (SELECT DATE_FORMAT(REG_TIME,'%Y-%m-%d') FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1)  REG_TIME
 	FROM RESERVATION_INFO AS RI
-	</select>  
+	WHERE 1 = 1 
+	
+	<include refid="reverseRearch"/>
+	ORDER BY RESERVATION_KEY
+	LIMIT #recordRowNum# , #pageSize#
+	</select>
+	
+	<select id="getRserveTotalCount" resultClass="int">
+	/* RESERVE.getRserveTotalCount */
+	
+	SELECT COUNT(*) AS TOTAL_COUNT FROM MEETINGROOM_INFO
+	WHERE 1=1
+	AND   STATUS = 'Y'
+	<include refid="reverseRearch"/>
+	</select>
+	
+	<select id="reservationView" resultClass="reserve">
+	/* RESERVE.reservationView */
+	
+	SELECT RI.RESERVATION_KEY
+	     , RI.NAME
+	     , RI.FIRM_NAME
+	     , RI.PHONE_NUMBER_1
+	     , RI.PHONE_NUMBER_2
+	     , RI.PHONE_NUMBER_3
+	     , RI.EMAIL_ADDR_1
+	  	 , RI.REQUEST
+	  	 , RI.STATUS
+	  	 , RI.STATUS_TIME
+	     , IFNULL(RI.EMAIL_ADDR_2, RI.EMAIL_ADDR_3) EMAIL_ADDR_2
+	     , IFNULL(RI.EMAIL_ADDR_3, RI.EMAIL_ADDR_2) EMAIL_ADDR_3
+	     , MI.NAME MEETINGROOM_NAME
+	     , RI.TOTAL_PRICE
+	     , RM.RESERVATION_DATE
+	     , RM.RESERVATION_TIME	  
+	     , CONCAT_WS("",RM.RESERVATION_TIME, ":00 ~ ", RM.RESERVATION_TIME+1, ":00") RESERVATION_TERM
+	  	 , ( SELECT CONCAT_WS("",FILE_PATH, SAVE_FILE_NAME)
+			 FROM MEETINGROOM_FILE
+			 WHERE MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+		     AND   STATUS = 'Y'
+			 LIMIT 1) AS IMAGE	  
+	     , RI.EVENT_NAME
+	     , RM.REG_TIME
+	FROM RESERVATION_INFO AS RI
+	INNER JOIN RESERVATION_MAPP AS RM ON RM.RESERVATION_KEY = RI.RESERVATION_KEY
+	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+	WHERE RI.RESERVATION_KEY = #reservation_key#
+	
+	</select>    
     
+    <update id="reserveUpdate">
+    /* MEETINGROOM.reserveUpdate */
+    
+    UPDATE RESERVATION_INFO SET
+    	STATUS			= #status#
+    ,	EVENT_NAME		= #event_name#
+    ,	REQUEST			= #request#
+    WHERE RESERVATION_KEY = #reservation_key#
+    </update>
 </sqlMap>
