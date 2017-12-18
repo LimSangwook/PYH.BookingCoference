@@ -78,6 +78,15 @@ public class ReserveServiceImpl implements ReserveService{
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getReservationStatusList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationStatusList", reserve);
+	}
+	
+	public ReserveDto getReservationDetail(ReserveDto reserve) throws Exception {
+		return (ReserveDto)commonDao.queryForObject("RESERVE.getReservationDetail", reserve);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public List<ReserveDto> reservationView(ReserveDto reserve) throws Exception {
 		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.reservationView", reserve);
 	}

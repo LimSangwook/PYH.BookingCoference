@@ -9,6 +9,7 @@
 	</ul>
 </div>
 <div id='calendar'></div>
+<div></div>
 
 <link href='/assets/comn/css/fullcalendar.min.css' rel='stylesheet' />
 <link href='/assets/comn/css/fullcalendar.print.min.css' rel='stylesheet' media='print' />
@@ -27,14 +28,42 @@
 				center: 'title',
 				right: 'next'
 			},
-			navLinks: true, // can click day/week names to navigate views
-			editable: true,
-			eventLimit: true, // allow "more" link when too many events
-			dayClick: function(date, jsEvent, view) {	
+			navLinks: true,
+		    navLinkDayClick: function(date, jsEvent) {
 		        var dateParam = "?reservation_date=" + date.format("YYYY") + "-" + date.format("MM") + "-" + date.format("DD");  
 		        location.href="reserve.do" + dateParam;
-		    }
+		    },
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			eventRender: function(event, element, view) {
+		        return $(event.title);
+		    },
+			events: [
+				<c:forEach var="event" items="${eventList}" varStatus="status">
+				{
+					title: '<p class="booking">'
+						 + '<a href="javascript:void(0)" onclick="popup(\'reserveReservationDetail.do'
+						 + '?meetingroom_key=<c:out value="${event.meetingroom_key}" />&reservation_time=<c:out value="${event.reservation_time}" />&reservation_date=<c:out value="${event.reservation_date}" />\', \'\', \'550\', \'250\', \'no\', \'no\', \'3\'); return false;">'
+						 + '<span class="circle <c:out value="${event.color}" />">'
+						 + '</span><span class="room"><c:out value="${event.meetingroom_name}" /></span>'
+						 + '<span class="time"> <c:out value="${event.reservation_term}" /></span></a></p>',
+					start: '<c:out value="${event.reservation_date}" />'
+				}
+				<c:if test="${!status.last}"> , </c:if>
+				</c:forEach>
+						
+			]
+		        
 		});
+		
+		var meetingrooms = [];
+		<c:forEach var="meetingroom" items="${meetingroomList}" varStatus="status">
+			meetingrooms.push('<p class="booking"><span class="circle ${meetingroom.color}"></span>${meetingroom.name}</p>');
+		</c:forEach>
+		var label = $('<div class="room_guide"></div>').append(meetingrooms.join(""));
+		
+
+		$(".fc-toolbar.fc-header-toolbar").append(label);
 		
 	});
 

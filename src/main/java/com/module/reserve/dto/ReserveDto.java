@@ -101,6 +101,7 @@ public class ReserveDto extends BaseForm{
 	private String total_times;
 	private String reservation_term;
 	private String time_availability;
+	private String color;
 
 	public String getReservation_key() {
 		return reservation_key;
@@ -390,7 +391,16 @@ public class ReserveDto extends BaseForm{
 
 	public void setEvent_name(String event_name) {
 		this.event_name = event_name;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}	
+	
 	
 	
 	

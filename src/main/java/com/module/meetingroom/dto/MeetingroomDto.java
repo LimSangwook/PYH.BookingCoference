@@ -57,6 +57,9 @@ public class MeetingroomDto extends BaseForm{
 
 	/* 미팅룸 삭제자ID */
 	private String del_id;
+
+	/* 색상 */
+	private String color;
 	
 	/* 미팅룸 사진 목록 */
 	private List<FileDto> fileList;
@@ -196,5 +199,14 @@ public class MeetingroomDto extends BaseForm{
 	public void setFileList(List<FileDto> fileList) {
 		this.fileList = fileList;
 	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+	
 }
 

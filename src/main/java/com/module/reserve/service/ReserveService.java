@@ -46,6 +46,10 @@ public interface ReserveService {
 	 * @return 
 	 * */
 	public List<ReserveDto> getReservationList(ReserveDto reserve) throws Exception;
+	
+	public List<ReserveDto> getReservationStatusList(ReserveDto reserve) throws Exception;
+	
+	public ReserveDto getReservationDetail(ReserveDto reserve) throws Exception; 
 
 	/**
 	 * 예약 현황

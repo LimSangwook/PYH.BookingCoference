@@ -250,6 +250,43 @@
 	<include refid="reverseRearch"/>
 	ORDER BY RESERVATION_KEY
 	LIMIT #recordRowNum# , #pageSize#
+	</select>  
+    
+    <select id="getReservationStatusList" resultClass="reserve">
+	/* RESERVE.getReservationList */
+	
+	SELECT MI.NAME MEETINGROOM_NAME
+	  , MI.COLOR
+	  , RM.RESERVATION_TIME
+	  , RM.RESERVATION_DATE
+	  , CONCAT_WS("", RM.RESERVATION_TIME, ":00 ~", RESERVATION_TIME+1, ":00") RESERVATION_TERM
+	  , MI.MEETINGROOM_KEY
+	FROM RESERVATION_INFO AS RI
+	INNER JOIN RESERVATION_MAPP AS RM ON RM.RESERVATION_KEY = RI.RESERVATION_KEY
+	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+	WHERE RI.STATUS IN ('Y', 'W')
+	</select>
+    
+    <select id="getReservationDetail" resultClass="reserve">
+	/* RESERVE.getReservationDetail */
+	
+	SELECT MI.NAME MEETINGROOM_NAME
+		  , RM.REG_TIME
+		  , RI.STATUS
+		  	 , CASE RI.STATUS WHEN 'Y' THEN '승인'
+		  	 	           WHEN 'W' THEN '신청'
+		  	 	           WHEN 'R' THEN '반려'
+		  	 	END STATUS_NAME
+		  , CASE WHEN CHAR_LENGTH(RI.NAME) > 2 THEN CONCAT_WS("", LEFT(RI.NAME, 1), REPEAT("*", CHAR_LENGTH(RI.NAME)-2), RIGHT(RI.NAME, 1))
+		  	 ELSE CONCAT_WS("", LEFT(RI.NAME, 1), REPEAT("*", CHAR_LENGTH(RI.NAME)-2)) END NAME
+	
+	FROM RESERVATION_MAPP RM 
+	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+	INNER JOIN RESERVATION_INFO AS RI ON RI.RESERVATION_KEY = RM.RESERVATION_KEY
+	WHERE RM.MEETINGROOM_KEY = #meetingroom_key#
+	AND   RM.RESERVATION_TIME = #reservation_time#
+	AND   RM.RESERVATION_DATE = #reservation_date#
+
 	</select>
 	
 	<select id="getRserveTotalCount" resultClass="int">
