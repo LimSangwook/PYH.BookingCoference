@@ -6,7 +6,7 @@
 		<li><a href="reserveCalendar.do">회의실 예약</a></li>
 		<li><a class="on" href="reserveStatusLogin.do">회의실 예약조회</a></li>
 	</ul>
-
+</div>
 
 <div class="reservation">
 	<div class="text_box">
@@ -21,9 +21,9 @@
 			<li class="active"><span class="step_no">03</span><span class="step_txt">예약완료 및 확인</li>
 		</ul>
 	</div>
-
+	
 	<div class="finish">
-		<img src="http://localhost:8080/upload/thumb${reserveInfo[0].image}" class="finish_img">
+		<img src="http://localhost:8080/upload/thumb${reserveInfo.image}" class="finish_img" alt="meetingroom img" height="240" width="251">
 		<table class="table_form">
 		<caption>회의실예약</caption>
 		<colgroup>
@@ -35,40 +35,36 @@
 		<tbody>
 			<tr>
 				<th scope="row">예약번호</th>
-				<td colspan="3">${reserveInfo[0].reservation_key}</td>
+				<td colspan="3">${reserveInfo.reservation_key}</td>
 			</tr>
 			<tr>
 				<th scope="row">예약자성명</th>
-				<td>${reserveInfo[0].name}</td>
+				<td>${reserveInfo.name}</td>
 				<th scope="row">소속 (기업명)</th>
-				<td>${reserveInfo[0].firm_name}</td>
+				<td>${reserveInfo.firm_name}</td>
 			</tr>
 			<tr>
 				<th scope="row">휴대전화</th>
-				<td>${reserveInfo[0].phone_number_1}-${reserveInfo[0].phone_number_2}-${reserveInfo[0].phone_number_3}</td>
+				<td>${reserveInfo.phone_number_1}-${reserveInfo.phone_number_2}-${reserveInfo.phone_number_3}</td>
 				<th scope="row">이메일</th>
-				<td>${reserveInfo[0].email_addr_1}@${reserveInfo[0].email_addr_2}</td>
+				<td>${reserveInfo.email_addr_1}@${reserveInfo.email_addr_2}</td>
 			</tr>
 			<tr>
 				<th scope="row">회의실</th>
-				<td>${reserveInfo[0].meetingroom_name}</td>
+				<td>${reserveInfo.meetingroom_name}</td>
 				<th scope="row">요금</th>
-				<td>${reserveInfo[0].total_price}원</td>
+				<td>${reserveInfo.total_price}원</td>
 			</tr>
 			<tr>
 				<th scope="row">날짜</th>
-				<td>${reserveInfo[0].reservation_date}</td>
+				<td>${reserveInfo.reservation_date}</td>
 				<th scope="row">시간</th>
-				<td>
-					<c:forEach var="reserve" items="${reserveInfo}" varStatus="status">
-					${reserve.reservation_term}<br>
-					</c:forEach>
-				</td>
+				<td>${reserveInfo.total_times}</td>
 			</tr>
 			<tr>
 				<th scope="row">추가요청사항 </th>
 				<td colspan="3">
-				${dateList[0].request}
+				${reserveInfo.request}
 				</td>
 			</tr>
 		</tbody>

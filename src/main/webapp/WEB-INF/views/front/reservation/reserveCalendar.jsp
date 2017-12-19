@@ -12,7 +12,6 @@
 <div></div>
 
 <link href='/assets/comn/css/fullcalendar.min.css' rel='stylesheet' />
-<link href='/assets/comn/css/fullcalendar.print.min.css' rel='stylesheet' media='print' />
 
 <script src="/assets/script/fullcalendar/moment.min.js"></script>
 <script src="/assets/script/fullcalendar/fullcalendar.min.js"></script>
@@ -31,7 +30,7 @@
 			navLinks: true,
 		    navLinkDayClick: function(date, jsEvent) {
 		        var dateParam = "?reservation_date=" + date.format("YYYY") + "-" + date.format("MM") + "-" + date.format("DD");  
-		        location.href="reserve.do" + dateParam;
+		        location.href="reserveDateTime.do" + dateParam;
 		    },
 			editable: true,
 			eventLimit: true, // allow "more" link when too many events
@@ -42,11 +41,11 @@
 				<c:forEach var="event" items="${eventList}" varStatus="status">
 				{
 					title: '<p class="booking">'
-						 + '<a href="javascript:void(0)" onclick="popup(\'reserveReservationDetail.do'
-						 + '?meetingroom_key=<c:out value="${event.meetingroom_key}" />&reservation_time=<c:out value="${event.reservation_time}" />&reservation_date=<c:out value="${event.reservation_date}" />\', \'\', \'550\', \'250\', \'no\', \'no\', \'3\'); return false;">'
+						 + '<a href="javascript:void(0)" onclick="popup(\'reserveDetail.do'
+						 + '?meetingroom_key=<c:out value="${event.meetingroom_key}" />&reservation_time=<c:out value="${event.total_times}" />&reservation_date=<c:out value="${event.reservation_date}" />\', \'\', \'550\', \'250\', \'no\', \'no\', \'3\'); return false;">'
 						 + '<span class="circle <c:out value="${event.color}" />">'
 						 + '</span><span class="room"><c:out value="${event.meetingroom_name}" /></span>'
-						 + '<span class="time"> <c:out value="${event.reservation_term}" /></span></a></p>',
+						 + '<span class="time"> <c:out value="${event.total_times}" /></span></a></p>',
 					start: '<c:out value="${event.reservation_date}" />'
 				}
 				<c:if test="${!status.last}"> , </c:if>

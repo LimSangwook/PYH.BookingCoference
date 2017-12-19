@@ -26,24 +26,6 @@
    	, 	CALCEL_TIME
     </sql>
 
-	<sql id="reverseRearch">		
-		<isNotEmpty prepend="AND" property="search_column">
-    		MEETINGROOM_KEY = #search_column#
-    	</isNotEmpty>
-		<isNotEmpty prepend="AND" property="search_name">
-    		NAME = #search_name#
-    	</isNotEmpty>
-		<isNotEmpty prepend="AND" property="srh_smonth">
-    		RESERVATION_DATE &gt;= #srh_smonth#
-    	</isNotEmpty>
-		<isNotEmpty prepend="AND" property="srh_emonth">
-    		RESERVATION_DATE &lt;= #srh_emonth#
-    	</isNotEmpty>
-		<isNotEmpty prepend="AND" property="srh_state">
-    		STATUS = #srh_state#
-    	</isNotEmpty>
-	</sql>
-
 	<select id="getMeetingroomStatusList" resultClass="reserve">
 	/* RESERVE.getMeetingroomStatusList */
 	
@@ -142,6 +124,7 @@
    	,	REQUEST
    	,	AGREE_TERM_PERSONAL_INFO
    	,	TOTAL_PRICE
+   	,   TOTAL_TIMES
    	,   STATUS
    	,   STATUS_TIME
     ) VALUES (
@@ -156,7 +139,8 @@
     ,	#email_addr_3#		     
     ,   #request#                  
     ,   #agree_term_personal_info# 
-    ,   #total_price#    
+    ,   #total_price#
+    ,   #total_times#       
     ,   'W'    
     ,   NOW()      
     )
@@ -200,29 +184,60 @@
 	     , RI.EMAIL_ADDR_1
 	  	 , RI.REQUEST
 	  	 , RI.STATUS
+	  	 , CASE RI.STATUS WHEN 'A' THEN '승인'
+	  	 	           WHEN 'W' THEN '신청'
+	  	 	           WHEN 'R' THEN '반려'
+	  	 	END STATUS_NAME
 	  	 , RI.STATUS_TIME
 	     , IFNULL(RI.EMAIL_ADDR_2, RI.EMAIL_ADDR_3) EMAIL_ADDR_2
 	     , IFNULL(RI.EMAIL_ADDR_3, RI.EMAIL_ADDR_2) EMAIL_ADDR_3
 	     , MI.NAME MEETINGROOM_NAME
 	     , RI.TOTAL_PRICE
-	     , RM.RESERVATION_DATE
-	     , RM.RESERVATION_TIME	  
-	     , CONCAT_WS("",RM.RESERVATION_TIME, ":00 ~ ", RM.RESERVATION_TIME+1, ":00") RESERVATION_TERM
+	     , RI.TOTAL_TIMES
+	     , RESERVATION.RESERVATION_DATE 
 	  	 , ( SELECT CONCAT_WS("",FILE_PATH, SAVE_FILE_NAME)
 			 FROM MEETINGROOM_FILE
-			 WHERE MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+			 WHERE MEETINGROOM_KEY = RESERVATION.MEETINGROOM_KEY
 		     AND   STATUS = 'Y'
 			 LIMIT 1) AS IMAGE	  
 	FROM RESERVATION_INFO AS RI
-	INNER JOIN RESERVATION_MAPP AS RM ON RM.RESERVATION_KEY = RI.RESERVATION_KEY
-	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
+	INNER JOIN
+	(SELECT RESERVATION_KEY
+		   , RESERVATION_DATE
+		   , MEETINGROOM_KEY
+	 FROM RESERVATION_MAPP RM
+	 GROUP BY RESERVATION_KEY) RESERVATION ON RESERVATION.RESERVATION_KEY = RI.RESERVATION_KEY
+	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RESERVATION.MEETINGROOM_KEY
 	WHERE RI.RESERVATION_KEY = #reservation_key#	
 	AND   RI.NAME = #name#
 	AND   RI.RESERVATION_PWD = #reservation_pwd#
-	</select>  
+	</select>
+	
+	<select id="getReserveTotalCount" resultClass="int">
+	/* RESERVE.getReserveTotalCount */
+	
+	SELECT COUNT(*) AS TOTAL_COUNT
+	FROM RESERVATION_INFO AS RI
+	WHERE 1 = 1
+	<isNotEmpty prepend="AND" property="search_column">
+   		(SELECT MI.MEETINGROOM_KEY FROM MEETINGROOM_INFO MI INNER JOIN RESERVATION_MAPP AS RM ON RM.MEETINGROOM_KEY = MI.MEETINGROOM_KEY WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) = #search_column#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="search_name">
+   		RI.NAME = #search_name#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="srh_smonth">
+   		(SELECT RM.RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) &gt;= #srh_smonth#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="srh_emonth">
+   		(SELECT RM.RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) &lt;= #srh_emonth#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="srh_state">
+   		RI.STATUS = #srh_state#
+   	</isNotEmpty>
+	</select> 
     
-    <select id="getReservationList" resultClass="reserve">
-	/* RESERVE.getReservationList */
+    <select id="getReserveCommonList" resultClass="reserve">
+	/* RESERVE.getReserveCommonList */
 	
 	SELECT RI.RESERVATION_KEY
 	     , RI.NAME
@@ -233,7 +248,7 @@
 	     , RI.EMAIL_ADDR_1
 	  	 , RI.REQUEST
 	  	 , RI.STATUS
-	  	 , CASE STATUS WHEN 'Y' THEN '승인'
+	  	 , CASE STATUS WHEN 'A' THEN '승인'
 	  	 	           WHEN 'W' THEN '신청'
 	  	 	           WHEN 'R' THEN '반려'
 	  	 	END STATUS_NAME
@@ -241,31 +256,80 @@
 	     , IFNULL(RI.EMAIL_ADDR_2, RI.EMAIL_ADDR_3) EMAIL_ADDR_2
 	     , IFNULL(RI.EMAIL_ADDR_3, RI.EMAIL_ADDR_2) EMAIL_ADDR_3
 	     , RI.TOTAL_PRICE
+	     , RI.EVENT_NAME
 	     , (SELECT NAME FROM MEETINGROOM_INFO MI INNER JOIN RESERVATION_MAPP AS RM ON RM.MEETINGROOM_KEY = MI.MEETINGROOM_KEY WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) MEETINGROOM_NAME
 	     , (SELECT RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) RESERVATION_DATE
 	     , (SELECT DATE_FORMAT(REG_TIME,'%Y-%m-%d') FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1)  REG_TIME
 	FROM RESERVATION_INFO AS RI
 	WHERE 1 = 1 
-	
-	<include refid="reverseRearch"/>
-	ORDER BY RESERVATION_KEY
+	<isNotEmpty prepend="AND" property="search_column">
+   		(SELECT MI.MEETINGROOM_KEY FROM MEETINGROOM_INFO MI INNER JOIN RESERVATION_MAPP AS RM ON RM.MEETINGROOM_KEY = MI.MEETINGROOM_KEY WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) = #search_column#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="search_name">
+   		RI.NAME = #search_name#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="srh_smonth">
+   		(SELECT RM.RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) &gt;= #srh_smonth#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="srh_emonth">
+   		(SELECT RM.RESERVATION_DATE FROM RESERVATION_MAPP AS RM WHERE RM.RESERVATION_KEY = RI.RESERVATION_KEY LIMIT 1) &lt;= #srh_emonth#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="srh_state">
+   		RI.STATUS = #srh_state#
+   	</isNotEmpty>
+	<dynamic>
+		<isEqual prepend="ORDER BY" property="order_column" compareValue="1"> RI.RESERVATION_KEY </isEqual>
+		<isEqual prepend="ORDER BY" property="order_column" compareValue="2"> RESERVATION_DATE </isEqual>	
+	</dynamic>	
+	<dynamic>
+		<isEqual prepend=" " property="order_type" compareValue="A">ASC</isEqual>
+		<isEqual prepend=" " property="order_type" compareValue="D">DESC</isEqual>
+	</dynamic>
 	LIMIT #recordRowNum# , #pageSize#
 	</select>  
     
-    <select id="getReservationStatusList" resultClass="reserve">
-	/* RESERVE.getReservationList */
+    <select id="getReserveEventList" resultClass="reserve">
+	/* RESERVE.getReserveEventList */
 	
-	SELECT MI.NAME MEETINGROOM_NAME
-	  , MI.COLOR
-	  , RM.RESERVATION_TIME
-	  , RM.RESERVATION_DATE
-	  , CONCAT_WS("", RM.RESERVATION_TIME, ":00 ~", RESERVATION_TIME+1, ":00") RESERVATION_TERM
-	  , MI.MEETINGROOM_KEY
-	FROM RESERVATION_INFO AS RI
-	INNER JOIN RESERVATION_MAPP AS RM ON RM.RESERVATION_KEY = RI.RESERVATION_KEY
-	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
-	WHERE RI.STATUS IN ('Y', 'W')
+	SELECT  MI.NAME MEETINGROOM_NAME
+	      , RI.TOTAL_TIMES
+		  , RESERVATION.RESERVATION_DATE
+		  , MI.MEETINGROOM_KEY
+		  , MI.COLOR
+	FROM RESERVATION_INFO RI
+	INNER JOIN
+	(SELECT RESERVATION_KEY
+		   , RESERVATION_DATE
+		   , MEETINGROOM_KEY
+	 FROM RESERVATION_MAPP RM
+	 GROUP BY RESERVATION_KEY) RESERVATION ON RESERVATION.RESERVATION_KEY = RI.RESERVATION_KEY
+	 INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RESERVATION.MEETINGROOM_KEY
+	 WHERE RI.STATUS IN ('A', 'W')
+	</select>  
+    
+    <select id="getReserveCalendarList" resultClass="reserve">
+	/* RESERVE.getReserveCalendarList */	
+	
+	SELECT *
+		 , CASE A.STATUS WHEN 'A' THEN '승인'
+	  	 	             WHEN 'W' THEN '신청'
+	  	 	             WHEN 'R' THEN '반려' END STATUS_NAME
+	FROM
+	(
+	SELECT COUNT(STATUS) CNT
+	     , STATUS
+		  , RESERVATION.RESERVATION_DATE
+	FROM RESERVATION_INFO RI
+	INNER JOIN
+	(SELECT RESERVATION_KEY
+		   , RESERVATION_DATE
+	 FROM RESERVATION_MAPP RM
+	 GROUP BY RESERVATION_KEY) RESERVATION ON RESERVATION.RESERVATION_KEY = RI.RESERVATION_KEY
+	 GROUP BY RESERVATION.RESERVATION_DATE, RI.STATUS
+	) A
 	</select>
+	
+	
     
     <select id="getReservationDetail" resultClass="reserve">
 	/* RESERVE.getReservationDetail */
@@ -273,7 +337,7 @@
 	SELECT MI.NAME MEETINGROOM_NAME
 		  , RM.REG_TIME
 		  , RI.STATUS
-		  	 , CASE RI.STATUS WHEN 'Y' THEN '승인'
+		  	 , CASE RI.STATUS WHEN 'A' THEN '승인'
 		  	 	           WHEN 'W' THEN '신청'
 		  	 	           WHEN 'R' THEN '반려'
 		  	 	END STATUS_NAME
@@ -289,17 +353,8 @@
 
 	</select>
 	
-	<select id="getRserveTotalCount" resultClass="int">
-	/* RESERVE.getRserveTotalCount */
-	
-	SELECT COUNT(*) AS TOTAL_COUNT FROM MEETINGROOM_INFO
-	WHERE 1=1
-	AND   STATUS = 'Y'
-	<include refid="reverseRearch"/>
-	</select>
-	
-	<select id="reservationView" resultClass="reserve">
-	/* RESERVE.reservationView */
+	<select id="reserveApproval" resultClass="reserve">
+	/* RESERVE.reserveApproval */
 	
 	SELECT RI.RESERVATION_KEY
 	     , RI.NAME
@@ -325,10 +380,12 @@
 			 LIMIT 1) AS IMAGE	  
 	     , RI.EVENT_NAME
 	     , RM.REG_TIME
+	     , RI.TOTAL_TIMES
 	FROM RESERVATION_INFO AS RI
 	INNER JOIN RESERVATION_MAPP AS RM ON RM.RESERVATION_KEY = RI.RESERVATION_KEY
 	INNER JOIN MEETINGROOM_INFO AS MI ON MI.MEETINGROOM_KEY = RM.MEETINGROOM_KEY
 	WHERE RI.RESERVATION_KEY = #reservation_key#
+	LIMIT 1
 	
 	</select>    
     

@@ -77,8 +77,11 @@ public class ReserveDto extends BaseForm{
 	/* 총가격 */
 	private String total_price;
 	
-	/* godtkaud */
+	/* 행사명 */
 	private String event_name;
+	
+	/* 수 */
+	private String cnt;
 	
 	
 	private String reservation_year;
@@ -399,7 +402,16 @@ public class ReserveDto extends BaseForm{
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getCnt() {
+		return cnt;
+	}
+
+	public void setCnt(String cnt) {
+		this.cnt = cnt;
 	}	
+	
 	
 	
 	

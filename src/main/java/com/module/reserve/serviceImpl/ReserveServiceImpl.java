@@ -62,36 +62,41 @@ public class ReserveServiceImpl implements ReserveService{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ReserveDto> getReservationResult(ReserveDto reserve) throws Exception {
-		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationResult", reserve);	
+	public ReserveDto getReservationResult(ReserveDto reserve) throws Exception {
+		return (ReserveDto)commonDao.queryForObject("RESERVE.getReservationResult", reserve);	
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ReserveDto> getReservationList(ReserveDto reserve) throws Exception {
-		List<ReserveDto> result = null;
-		int totalCount = (Integer)commonDao.queryForObject("RESERVE.getRserveTotalCount", reserve);
-		if(totalCount > 0){
-			result = (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationList", reserve);
-			reserve.setTotal_count(totalCount);
-		}
-		return result;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<ReserveDto> getReservationStatusList(ReserveDto reserve) throws Exception {
-		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReservationStatusList", reserve);
+	public List<ReserveDto> getReserveEventList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReserveEventList", reserve);
 	}
 	
 	public ReserveDto getReservationDetail(ReserveDto reserve) throws Exception {
 		return (ReserveDto)commonDao.queryForObject("RESERVE.getReservationDetail", reserve);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<ReserveDto> reservationView(ReserveDto reserve) throws Exception {
-		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.reservationView", reserve);
+	public ReserveDto reserveApproval(ReserveDto reserve) throws Exception {
+		return (ReserveDto)commonDao.queryForObject("RESERVE.reserveApproval", reserve);
 	}
 	
 	public void reserveUpdate(ReserveDto reserve) throws Exception {
 		commonDao.update("RESERVE.reserveUpdate", reserve);
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getReserveCommonList(ReserveDto reserve) throws Exception {
+		List<ReserveDto> result = null;
+		int totalCount = (Integer)commonDao.queryForObject("RESERVE.getReserveTotalCount", reserve);
+		if(totalCount > 0){
+			result = (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReserveCommonList", reserve);
+			reserve.setTotal_count(totalCount);
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ReserveDto> getReserveCalendarList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReserveCalendarList", reserve);		
 	}
 }

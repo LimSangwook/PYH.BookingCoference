@@ -150,7 +150,8 @@
 <script type="text/javascript">
 function reserveMeetingroomSubmit(){
 	if (!$("#agree_term_personal_info").prop("checked")) {
-		alert("개인정보 수집 및 이용에 동의하여 주세요.")
+		alert("개인정보 수집 및 이용에 동의하여 주세요.");
+		return;
 	}
 	
 	if(formValidate()){

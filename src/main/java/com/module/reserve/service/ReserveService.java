@@ -39,23 +39,34 @@ public interface ReserveService {
 	 * 예약 저장
 	 * @return 
 	 * */
-	public List<ReserveDto> getReservationResult(ReserveDto reserve) throws Exception;
+	public ReserveDto getReservationResult(ReserveDto reserve) throws Exception;
 
 	/**
 	 * 예약목록
 	 * @return 
 	 * */
-	public List<ReserveDto> getReservationList(ReserveDto reserve) throws Exception;
+	public List<ReserveDto> getReserveCommonList(ReserveDto reserve) throws Exception;
+
+	/**
+	 * 예약 이벤트 목록
+	 * @return 
+	 * */	
+	public List<ReserveDto> getReserveEventList(ReserveDto reserve) throws Exception;
+
+	/**
+	 * 예약 일별 목록
+	 * @return 
+	 * */	
+	public List<ReserveDto> getReserveCalendarList(ReserveDto reserve) throws Exception;
 	
-	public List<ReserveDto> getReservationStatusList(ReserveDto reserve) throws Exception;
 	
 	public ReserveDto getReservationDetail(ReserveDto reserve) throws Exception; 
 
 	/**
-	 * 예약 현황
+	 * 예약 승인페이지
 	 * @return 
 	 * */
-	public List<ReserveDto> reservationView(ReserveDto reserve) throws Exception;
+	public ReserveDto reserveApproval(ReserveDto reserve) throws Exception;
 
 	/**
 	 * 예약 현황

@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.common.util.CommonWebUtils;
 import com.common.util.PagingUtil;
+import com.module.main.service.MainService;
 import com.module.meetingroom.dto.MeetingroomDto;
 import com.module.meetingroom.service.MeetingroomService;
 import com.module.reserve.dto.ReserveDto;
@@ -26,6 +27,9 @@ import com.module.reserve.service.ReserveService;
 public class ReserveController extends CommonWebUtils{
 
 	private Logger log = LoggerFactory.getLogger(getClass());
+
+	@Autowired
+	private MainService mainService;
 	
 	@Resource(name = "messageSourceAccessor")
 	private MessageSourceAccessor message;
@@ -37,7 +41,7 @@ public class ReserveController extends CommonWebUtils{
 	private ReserveService reserveService;
 	
 	/**
-	 * 회의실 관리 목록
+	 * 회의실 관리 목록 - 달력
 	 * @param request
 	 * @param meetingroom
 	 * @return
@@ -49,43 +53,74 @@ public class ReserveController extends CommonWebUtils{
 		
 		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveCalendarList");
 		try {
-			mav.addObject("reserveInfo", reserve);			
+			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList(reserve);
+			List<MeetingroomDto> meetingroomList = meetingroomService.getMeetingroomList();
+			mav.addObject("meetingroomList", meetingroomList);			
+			mav.addObject("dailyEvent", dailyEvent);		
 			
 		} catch (Exception e) {
 			if(log.isDebugEnabled())log.debug(e.toString());
 			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
 		}		
 		
-		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveForm()");
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveCalendarList()");
 		return mav;
 	}
 	
 	/**
-	 * 회의실 관리 목록
+	 * 회의실 관리 목록 - 일반
 	 * @param request
 	 * @param meetingroom
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/siteManage/**/reserveList")
-	public ModelAndView reserveList(HttpServletRequest request, ReserveDto reserve) throws Exception{
-		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveList()");
+	@RequestMapping("/siteManage/**/reserveCommonList")
+	public ModelAndView reserveCommonList(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveCommonList()");
 		
-		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveList");
+		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveCommonList");
 		try {
 			reserve.setSearch_type(StringUtils.equals("adminManage", (String)request.getAttribute("menuCode"))?"admin":"member");
-			List<ReserveDto> reservationList = reserveService.getReservationList(reserve);
+			List<ReserveDto> reservationList = reserveService.getReserveCommonList(reserve);
+			List<MeetingroomDto> meetingroomList = meetingroomService.getMeetingroomList();
+			mav.addObject("meetingroomList", meetingroomList);			
 			mav.addObject("theForm", reserve);			
 			mav.addObject("reservationList", reservationList);
+			mav.addObject("userAuthLevelCodeList", mainService.getCommonCodeList("USER_AUTH_LEVEL"));
 			mav.addObject("defaultParameter", getParameter(request,"&","meetingroom_key|order_type|order_column"));
-			mav.addObject("pageNavigation", PagingUtil.printPageNavi(reserve, getParameter(request,"reserveList.do?","reservationkey|page")));
+			mav.addObject("pageNavigation", PagingUtil.printPageNavi(reserve, getParameter(request,"reserveCommonList.do?","reservationkey|page")));
 			
 		} catch (Exception e) {
 			if(log.isDebugEnabled())log.debug(e.toString());
 			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
 		}		
 		
-		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveList()");
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveCommonList()");
+		return mav;
+	}
+	
+	/**
+	 * 예약 승인페이지
+	 * @param request
+	 * @param ReserveDto 
+	 * @return ModelAndView
+	 * @throws Exception
+	 */	
+	@RequestMapping("/siteManage/**/reserveApproval")
+	public ModelAndView reserveApproval(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveApproval()");
+		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveApproval");
+		
+		try {	
+			ReserveDto result = reserveService.reserveApproval(reserve);
+			mav.addObject("reserveInfo", result);
+			
+		} catch (Exception e) {
+			if(log.isDebugEnabled())log.debug(e.toString());
+			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
+		}		
+		
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveApproval()");
 		return mav;
 	}
 	
@@ -100,7 +135,7 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveGuide(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveGuide()");
 		
-		ModelAndView mav = new ModelAndView("front/reservation/reservationGuide");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveGuide");
 		
 		try {
 			mav.addObject("reserveInfo", reserve);			
@@ -125,10 +160,10 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveCalendar(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveCalendar()");
 		
-		ModelAndView mav = new ModelAndView("front/reservation/reservationCalendar");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveCalendar");
 		
 		try {
-			List<ReserveDto> eventList = reserveService.getReservationStatusList(reserve);
+			List<ReserveDto> eventList = reserveService.getReserveEventList(reserve);
 			List<MeetingroomDto> meetingroomList = meetingroomService.getMeetingroomList();
 			mav.addObject("meetingroomList", meetingroomList);			
 			mav.addObject("eventList", eventList);			
@@ -149,11 +184,11 @@ public class ReserveController extends CommonWebUtils{
 	 * @return ModelAndView
 	 * @throws Exception
 	 */	
-	@RequestMapping("/front/**/reserveReservationDetail")
-	public ModelAndView reserveReservationDetail(HttpServletRequest request, ReserveDto reserve) throws Exception{
-		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveReservationDetail()");
+	@RequestMapping("/front/**/reserveDetail")
+	public ModelAndView reserveDetail(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveDetail()");
 		
-		ModelAndView mav = new ModelAndView("front/reservation/reservationDetail");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveDetail");
 		
 		try { 
 			mav.addObject("detail", reserveService.getReservationDetail(reserve));			
@@ -163,7 +198,7 @@ public class ReserveController extends CommonWebUtils{
 			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
 		}		
 		
-		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveReservationDetail()");
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveDetail()");
 		return mav;
 	}
 	
@@ -174,11 +209,11 @@ public class ReserveController extends CommonWebUtils{
 	 * @return ModelAndView
 	 * @throws Exception
 	 */	
-	@RequestMapping("/front/**/reserve")
-	public ModelAndView reserve(HttpServletRequest request, ReserveDto reserve) throws Exception{
-		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserve()");
+	@RequestMapping("/front/**/reserveDateTime")
+	public ModelAndView reserveDateTime(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveDateTime()");
 	
-		ModelAndView mav = new ModelAndView("front/reservation/reservation");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveDateTime");
 		try {					
 			List<ReserveDto> meetingrooms = reserveService.getMeetingroomStatusList(reserve);
 			mav.addObject("meetingroomList", meetingrooms);
@@ -197,7 +232,7 @@ public class ReserveController extends CommonWebUtils{
 			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
 		}		
 		
-		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserve()");
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveDateTime()");
 		return mav;
 	}
 	
@@ -212,7 +247,7 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveUser(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveUser()");
 	
-		ModelAndView mav = new ModelAndView("front/reservation/reservationUser");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveUser");
 		try {
 			MeetingroomDto meetingroom = meetingroomService.getMeetingroomInfo(reserve.getMeetingroom_key());
 			reserve.setMeetingroom_name(meetingroom.getName());
@@ -272,7 +307,7 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveStatus(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveStatus()");
 	
-		ModelAndView mav = new ModelAndView("front/reservation/reservationStatus");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveStatus");
 		try {	
 			mav.addObject("reserveInfo", reserveService.getReservationResult(reserve));
 			
@@ -296,7 +331,7 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveResult(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveResult()");
 	
-		ModelAndView mav = new ModelAndView("front/reservation/reservationResult");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveResult");
 		try {	
 			mav.addObject("reserveInfo", reserveService.getReservationResult(reserve));
 			
@@ -320,35 +355,9 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveStatusLogin(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveStatusLogin()");
 	
-		ModelAndView mav = new ModelAndView("front/reservation/reservationLogin");
+		ModelAndView mav = new ModelAndView("front/reservation/reserveLogin");
 		
 		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveStatusLogin()");
-		return mav;
-	}
-	
-	/**
-	 * 예약 현황보기
-	 * @param request
-	 * @param ReserveDto 
-	 * @return ModelAndView
-	 * @throws Exception
-	 */	
-	@RequestMapping("/siteManage/**/reserveView")
-	public ModelAndView reserveView(HttpServletRequest request, ReserveDto reserve) throws Exception{
-		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveView()");
-		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveView");
-		
-		try {	
-			List<ReserveDto> result = reserveService.reservationView(reserve);
-			mav.addObject("reserveList", result);
-			mav.addObject("reserveInfo", result.get(0));
-			
-		} catch (Exception e) {
-			if(log.isDebugEnabled())log.debug(e.toString());
-			redirectView(mav, message.getMessage(e.getMessage(), message.getMessage("ERROR.ACCESS.FAIL")), getReferer(request));
-		}		
-		
-		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveView()");
 		return mav;
 	}
 	
@@ -368,7 +377,7 @@ public class ReserveController extends CommonWebUtils{
 
 		try {
 			reserveService.reserveUpdate(reserve);
-			returnPage = "reserveView.do?reservation_key="+reserve.getReservation_key();
+			returnPage = "reserveApproval.do?reservation_key="+reserve.getReservation_key();
 			
 			redirectView(mav, "", returnPage);
 		} catch (Exception e) {

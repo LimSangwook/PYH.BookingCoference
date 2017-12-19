@@ -88,7 +88,7 @@
 
 	
 </div><!-- //reservation -->
-<form:form id="retrieveForm" commandName="reserveInfo" action="reserve.do">
+<form:form id="retrieveForm" commandName="reserveInfo" action="reserveDateTime.do">
 <form:hidden path="meetingroom_key"/>
 <form:hidden path="reservation_date"/>
 </form:form>
@@ -133,6 +133,26 @@
 			alert("이미 예약이 완료된 회의실 입니다.");
 			return;
 		}
+		
+		if ($(this).hasClass("select")) {
+			$(this).toggleClass("select");
+			return;			
+		}
+		
+		var serial = false;
+		$(".time").each(function(){
+			if ($(this).hasClass("select")) {
+				serial = true;
+			}
+		});
+				
+		if (serial) {
+			if (!$(this).parent("li").next().children("a").hasClass("select") && !$(this).parent("li").prev().children("a").hasClass("select")) {
+				alert("연속된 회의실만 선택 할 수 있습니다.");
+				return;
+			}			
+		}
+		
 	    $(this).toggleClass("select");
 	});
 </script>

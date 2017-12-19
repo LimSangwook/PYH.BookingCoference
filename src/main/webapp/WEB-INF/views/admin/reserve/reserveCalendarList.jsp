@@ -3,12 +3,11 @@
 
 <ul class="tabMenu menu_6">
 	<li><a href="reserveCalendarList.do" class="active"><span>달력으로 보기</span></a></li>
-	<li><a href="reserveList.do"><span>목록으로 보기</span></a></li>
+	<li><a href="reserveCommonList.do"><span>목록으로 보기</span></a></li>
 </ul>
 <div id='calendar'></div>
 
 <link href='/assets/comn/css/fullcalendar.min.css' rel='stylesheet' />
-<link href='/assets/comn/css/fullcalendar.print.min.css' rel='stylesheet' media='print' />
 
 <script src="/assets/script/fullcalendar/moment.min.js"></script>
 <script src="/assets/script/fullcalendar/fullcalendar.min.js"></script>
@@ -20,73 +19,39 @@
 		
 		$('#calendar').fullCalendar({
 			header: {
-				left: 'prev,next today',
+				left: 'prev',
 				center: 'title',
-				right: ''
+				right: 'next'
 			},
-			defaultDate: '2017-11-12',
-			navLinks: true, // can click day/week names to navigate views
+			navLinks: false,
 			editable: true,
 			eventLimit: true, // allow "more" link when too many events
+			eventRender: function(event, element, view) {
+		        return $(event.title);
+		    },		    
 			events: [
+				<c:forEach var="event" items="${dailyEvent}" varStatus="status">
 				{
-					title: 'All Day Event',
-					start: '2017-11-01'
-				},
-				{
-					title: 'Long Event',
-					start: '2017-11-07',
-					end: '2017-11-10'
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: '2017-11-09T16:00:00'
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: '2017-11-16T16:00:00'
-				},
-				{
-					title: 'Conference',
-					start: '2017-11-11',
-					end: '2017-11-13'
-				},
-				{
-					title: 'Meeting',
-					start: '2017-11-12T10:30:00',
-					end: '2017-11-12T12:30:00'
-				},
-				{
-					title: 'Lunch',
-					start: '2017-11-12T12:00:00'
-				},
-				{
-					title: 'Meeting',
-					start: '2017-11-12T14:30:00'
-				},
-				{
-					title: 'Happy Hour',
-					start: '2017-11-12T17:30:00'
-				},
-				{
-					title: 'Dinner',
-					start: '2017-11-12T20:00:00'
-				},
-				{
-					title: 'Birthday Party',
-					start: '2017-11-13T07:00:00'
-				},
-				{
-					title: 'Click for Google',
-					url: 'http://google.com/',
-					start: '2017-11-28'
+					title: '<a href="reserveCommonList.do?srh_state=<c:out value="${event.status}"/>'
+						 + '&srh_smonth=<c:out value="${event.reservation_date}"/>'
+						 + '&srh_emonth=<c:out value="${event.reservation_date}"/>">'
+						 + '<c:out value="${event.status_name}"/>(<c:out value="${event.cnt}"/>)</a><br>',
+					start: '<c:out value="${event.reservation_date}" />'
 				}
+				<c:if test="${!status.last}"> , </c:if>
+				</c:forEach>
+						
 			]
-		});
-		
+		        
+		});		
 	});
 
 </script>
 
+
+<style>
+.fc-event-container {
+    text-align: center;
+    vertical-align: middle;
+}
+</style>

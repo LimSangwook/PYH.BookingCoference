@@ -78,7 +78,7 @@
 			</tr>
 			<tr>
 				<th scope="row">시간</th>
-				<td>???????</td>
+				<td>${reserveInfo.total_times}</td>
 				<th scope="row">요금</th>
 				<td>${reserveInfo.total_price}원</td>
 			</tr>
@@ -95,7 +95,7 @@
 </div>
 
 <div class="btn_wrap textAlign_right">
-	<a href="reserveList.do" class="btn ">목록</a>
+	<a href="reserveCommonList.do" class="btn ">목록</a>
 	<button type="submit" class="btn primary">확인</button>
 </div>
 

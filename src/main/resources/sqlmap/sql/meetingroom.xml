@@ -55,6 +55,7 @@
    	,	PUBLISH
    	,	REG_DATE		
    	,	REG_ID
+   	,   COLOR
     ) VALUES (
     	#name#
     ,	#type#
@@ -65,6 +66,7 @@
     ,	#publish#
     ,	NOW()	
     ,	#reg_id#
+    ,   #color#
     )
     
 	   	<selectKey resultClass="int" >
@@ -86,6 +88,7 @@
    	,	PUBLISH			= #publish#
     ,	MOD_DATE		= NOW()
    	,	MOD_ID			= #mod_id#
+   	,   COLOR			= #color#
     WHERE MEETINGROOM_KEY = #meetingroom_key#
     </update>
     

@@ -63,6 +63,23 @@
 				<form:input path="facility" title="주요시설" cssClass="col100" maxlength="255"/>
 			</td>
 		</tr>
+		<tr>
+			<th scope="row">색상</th>
+			<td>
+				<form:select path="color" title="색상" isNullCheck="true" class="rooms">
+					<form:option class="room_1" value="room_1" label="색상1"/>						
+					<form:option class="room_2" value="room_2" label="색상2"/>
+					<form:option class="room_3" value="room_3" label="색상3"/>
+					<form:option class="room_4" value="room_4" label="색상4"/>
+					<form:option class="room_5" value="room_5" label="색상5"/>
+					<form:option class="room_6" value="room_6" label="색상6"/>
+					<form:option class="room_7" value="room_7" label="색상7"/>
+					<form:option class="room_8" value="room_8" label="색상8"/>
+					<form:option class="room_9" value="room_9" label="색상9"/>
+					<form:option class="room_10" value="room_10" label="색상10"/>
+				</form:select>
+			</td>
+		</tr>
 	</tbody>
 </table><!-- //table_basic -->
 </form:form>
@@ -116,12 +133,12 @@ $(function(){
 		}
 	});
 	
-	$('#video_type').on('change',function(){		
-		if($(this).val() == '1'){
-			$('#link_address').prop('disabled',true);
-		} else {
-			$('#link_address').prop('disabled',false);
-		}
-	});
+	$('#color').change(
+	    function (){
+	        var color = $('option:selected',this).css('background-color');
+	        $(this).css('background-color',color);
+	    }
+	).change();
+	
 });
 </script>

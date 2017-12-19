@@ -3,26 +3,23 @@
 
 <ul class="tabMenu menu_6">
 	<li><a href="reserveCalendarList.do"><span>달력으로 보기</span></a></li>
-	<li><a href="reserveList.do" class="active"><span>목록으로 보기</span></a></li>
+	<li><a href="reserveCommonList.do" class="active"><span>목록으로 보기</span></a></li>
 </ul>
 	
 
 <fieldset>
 <legend></legend>
-<form:form commandName="theForm" action="userList.do" method="get">
+<form:form commandName="theForm" action="reserveCommonList.do" method="get">
 	<div class="search_wrap search_wrap3">
 		<ul>
 			<li class=" title100">
 				<span class="title">회의실</span>
-				<form:select path="search_column" title="검색구분 선택">
-					<option value="1">지하대회의실</option>
-					<option value="2">3층소회의실</option>
-					<option value="3">동아리실1</option>
-					<option value="4">동아리실2</option>
-					<option value="5">동아리실3</option>
-					<option value="6">동아리실4</option>
-					<option value="7">동아리실5</option>
-			</form:select>
+				<form:select path="search_column" title="회의실 선택">
+					<form:option value="">전체</form:option>
+				<c:forEach var="meetingroom" items="${meetingroomList}" varStatus="status">
+					<form:option value="${meetingroom.meetingroom_key}">${meetingroom.name}</form:option>
+				</c:forEach>
+				</form:select>
 			</li>
 			<li class=" title100">
 				<span class="title">예약자명</span>
@@ -34,14 +31,13 @@
 			</li>
 			<li class=" title100">
 				<span class="title">예약현황</span>
-				<form:radiobutton path="srh_state" id="srh_state1" value="ALL"/> <label for="srh_state1">전체</label>&nbsp;&nbsp;
+				<form:radiobutton path="srh_state" id="srh_state1" value=""/> <label for="srh_state1">전체</label>&nbsp;&nbsp;
 				<form:radiobutton path="srh_state" id="srh_state2" value="W"/> <label for="srh_state2">신청</label>&nbsp;&nbsp;
-				<form:radiobutton path="srh_state" id="srh_state3" value="Y"/> <label for="srh_state3">승인</label>&nbsp;&nbsp;
+				<form:radiobutton path="srh_state" id="srh_state3" value="A"/> <label for="srh_state3">승인</label>&nbsp;&nbsp;
 				<form:radiobutton path="srh_state" id="srh_state4" value="R"/> <label for="srh_state4">반려</label>
 			</li>
 		</ul>
-
-		<a href="#" class="btn inverse btn_small"><span class="ico ico_search"></span>검색</a>
+		<button type="submit" class="btn inverse btn_small"><span class="ico ico_search"></span>검색</button>
 	</div><!-- //search_wrap -->
 </form:form>
 </fieldset>
@@ -71,13 +67,13 @@
 		<tr>
 				<td>${reservation.reservation_key}</td>
 				<td>${reservation.meetingroom_name}</td>
-				<td><a href="reserveView.do?reservation_key=${reservation.reservation_key}">${reservation.name}</a></td>
-				<td>-</td>
+				<td><a href="reserveApproval.do?reservation_key=${reservation.reservation_key}">${reservation.name}</a></td>
+				<td>${reservation.event_name}</td>
 				<td>${reservation.reservation_date}</td>
 				<td>${reservation.reg_time}</td>
 				<td><span class="label
 				 	<c:choose>
-					<c:when test="${reservation.status == 'Y'}"> success </c:when>
+					<c:when test="${reservation.status == 'A'}"> success </c:when>
 					<c:when test="${reservation.status == 'W'}"> primary </c:when>
 					<c:when test="${reservation.status == 'R'}"></c:when>
 					</c:choose>
