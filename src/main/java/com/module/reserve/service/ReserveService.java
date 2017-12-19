@@ -57,7 +57,7 @@ public interface ReserveService {
 	 * 예약 일별 목록
 	 * @return 
 	 * */	
-	public List<ReserveDto> getReserveCalendarList(ReserveDto reserve) throws Exception;
+	public List<ReserveDto> getReserveCalendarList() throws Exception;
 	
 	
 	public ReserveDto getReservationDetail(ReserveDto reserve) throws Exception; 

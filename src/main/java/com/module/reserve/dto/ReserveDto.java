@@ -23,6 +23,15 @@ public class ReserveDto extends BaseForm{
 	/* 예약일자 */
 	private String reservation_date;
 	
+	/* 예약일자 yyyy*/
+	private String reservation_yyyy;
+	
+	/* 예약일자 mm*/
+	private String reservation_mm;
+	
+	/* 예약일자 dd*/
+	private String reservation_dd;
+	
 	/* 예약 비밀번호 */
 	private String reservation_pwd;
 	
@@ -133,8 +142,31 @@ public class ReserveDto extends BaseForm{
 	public String getReservation_date() {
 		return reservation_date;
 	}
+		
+	public String getReservation_yyyy() {
+		return reservation_yyyy;
+	}
 
-	
+	public void setReservation_yyyy(String reservation_yyyy) {
+		this.reservation_yyyy = reservation_yyyy;
+	}
+
+	public String getReservation_mm() {
+		return reservation_mm;
+	}
+
+	public void setReservation_mm(String reservation_mm) {
+		this.reservation_mm = reservation_mm;
+	}
+
+	public String getReservation_dd() {
+		return reservation_dd;
+	}
+
+	public void setReservation_dd(String reservation_dd) {
+		this.reservation_dd = reservation_dd;
+	}
+
 	public String getRoom_availability() {
 		return room_availability;
 	}

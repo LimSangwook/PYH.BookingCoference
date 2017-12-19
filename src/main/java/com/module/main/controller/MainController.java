@@ -28,6 +28,8 @@ import com.module.museum.dto.MuseumDto;
 import com.module.museum.service.MuseumService;
 import com.module.popup.dto.PopupDto;
 import com.module.popup.service.PopupService;
+import com.module.reserve.dto.ReserveDto;
+import com.module.reserve.service.ReserveService;
 import com.module.seo.dto.SeoDto;
 import com.module.seo.service.SeoService;
 
@@ -63,6 +65,9 @@ public class MainController extends CommonWebUtils{
 	@Autowired
 	private DataService dataService;
 	
+	@Autowired
+	private ReserveService reserveService;
+	
 	
 	/**
 	 * 박물관 포털 메인
@@ -90,6 +95,7 @@ public class MainController extends CommonWebUtils{
 				}	
 			}
 			mav.addObject("mainPopupList", popupList);
+			
 					
 		} catch (Exception e) {
 			if(log.isWarnEnabled())log.warn(e.getMessage());
@@ -136,6 +142,9 @@ public class MainController extends CommonWebUtils{
 
 			GenerateDto generateData = dataService.selectGenerate();
 			mav.addObject("generateData", generateData);
+
+			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList();
+			mav.addObject("dailyEvent", dailyEvent);
 			
 		} catch (Exception e) {
 			if(log.isWarnEnabled())log.warn(e.toString());

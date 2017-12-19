@@ -377,11 +377,14 @@
                     strHtml += "<td>&nbsp;</td>";
                     strnbsp++;
                   } else {
-
-                    if (ndays == '25' && ojbMonth == nMonth) {// 일정있는날짜 확인(2월 25일 예시)
+               	  	<c:forEach var="event" items="${dailyEvent}" varStatus="status">
+               	  	console.log("ndays => " +ndays + ":" +"${event.reservation_dd}" );
+               	 	console.log("ojbMonth => " +ojbMonth + ":" +"${event.reservation_mm}" );
+                    if (ndays == "${event.reservation_dd}" && ojbMonth == "${event.reservation_mm}") {// 일정있는날짜 확인(2월 25일 예시)
                       var getCurTime = func_Time();
                       strHtml += "<td class=\"show\"><a href=\"#show\"><span>" + ndays + "</span></a></td>";
                     } else strHtml += "<td class='" + (j == 1 ? "sun" : (j == 7 ? "sat" : "")) + "'><span>" + ndays + "</span></td>";
+                     </c:forEach>
                       ndays++
                     };
                 } else strHtml += "<td>&nbsp;</td>";
@@ -400,7 +403,7 @@
           };
 
           $(document).ready(function() {
-            ShowCalenda();
+            ShowCalenda();           
           });
 
           </script>

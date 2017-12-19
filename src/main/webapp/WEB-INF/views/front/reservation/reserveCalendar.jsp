@@ -42,7 +42,7 @@
 				{
 					title: '<p class="booking">'
 						 + '<a href="javascript:void(0)" onclick="popup(\'reserveDetail.do'
-						 + '?meetingroom_key=<c:out value="${event.meetingroom_key}" />&reservation_time=<c:out value="${event.total_times}" />&reservation_date=<c:out value="${event.reservation_date}" />\', \'\', \'550\', \'250\', \'no\', \'no\', \'3\'); return false;">'
+						 + '?meetingroom_key=<c:out value="${event.meetingroom_key}" />&total_times=<c:out value="${event.total_times}" />&reservation_date=<c:out value="${event.reservation_date}" />\', \'\', \'550\', \'250\', \'no\', \'no\', \'3\'); return false;">'
 						 + '<span class="circle <c:out value="${event.color}" />">'
 						 + '</span><span class="room"><c:out value="${event.meetingroom_name}" /></span>'
 						 + '<span class="time"> <c:out value="${event.total_times}" /></span></a></p>',

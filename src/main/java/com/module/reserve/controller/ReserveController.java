@@ -53,7 +53,7 @@ public class ReserveController extends CommonWebUtils{
 		
 		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveCalendarList");
 		try {
-			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList(reserve);
+			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList();
 			List<MeetingroomDto> meetingroomList = meetingroomService.getMeetingroomList();
 			mav.addObject("meetingroomList", meetingroomList);			
 			mav.addObject("dailyEvent", dailyEvent);		
@@ -188,7 +188,7 @@ public class ReserveController extends CommonWebUtils{
 	public ModelAndView reserveDetail(HttpServletRequest request, ReserveDto reserve) throws Exception{
 		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveDetail()");
 		
-		ModelAndView mav = new ModelAndView("front/reservation/reserveDetail");
+		ModelAndView mav = new ModelAndView("popup.layout");
 		
 		try { 
 			mav.addObject("detail", reserveService.getReservationDetail(reserve));			
@@ -233,6 +233,41 @@ public class ReserveController extends CommonWebUtils{
 		}		
 		
 		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveDateTime()");
+		return mav;
+	}
+	
+	/**
+	 * 회의실 /날짜/시간 선택
+	 * @param request
+	 * @param ReserveDto 
+	 * @return ModelAndView
+	 * @throws Exception
+	 */	
+	@RequestMapping("/front/**/reserveDateTimeJson")
+	public ModelAndView reserveDateTimeJson(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".reserveDateTimeJson()");
+	
+		ModelAndView mav = new ModelAndView("jsonViewer");
+		
+		try {
+			mav.addObject("RESULT_CODE","SUCCESS");					
+			List<ReserveDto> meetingrooms = reserveService.getMeetingroomStatusList(reserve);
+			mav.addObject("meetingroomList", meetingrooms);
+			
+			if (reserve.getMeetingroom_key() == null || "".equals(reserve.getMeetingroom_key())) {
+				reserve.setMeetingroom_key(meetingrooms.get(0).getMeetingroom_key());
+			}
+			
+			mav.addObject("dateList", reserveService.getDateList(reserve));
+			mav.addObject("timeList", reserveService.getTimeList(reserve));
+			
+		} catch (Exception e) {
+			mav.addObject("RESULT_CODE","FAIL");
+			if(log.isWarnEnabled())log.warn(e.getMessage());
+		}
+		
+		
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".reserveDateTimeJson()");
 		return mav;
 	}
 	

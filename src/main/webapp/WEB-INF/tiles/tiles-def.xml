@@ -100,6 +100,13 @@
   	</definition>
   	
   	<!-- =======================================================	-->
+	<!-- popup.layout											  										      	-->
+	<!-- =======================================================  	-->
+	<definition name="popup.layout" template="/WEB-INF/views/front/reservation/reserveDetail.jsp">								
+		<put-attribute name="content"	/>		
+  	</definition>
+  	
+  	<!-- =======================================================	-->
 	<!-- Common Message								  										      	-->
 	<!-- =======================================================  	-->
   	<definition name="common.message" extends="empty.layout">		
