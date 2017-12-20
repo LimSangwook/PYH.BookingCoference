@@ -20,8 +20,14 @@
 <script>
 
 	$(document).ready(function() {
-		
+
 		$('#calendar').fullCalendar({
+			<c:if test="${dailyEvent.reservation_yyyy  && dailyEvent.reservation_mm && dailyEvent.reservation_dd}">
+		  year: ${dailyEvent.reservation_yyyy},
+		  month: ${dailyEvent.reservation_mm},
+		  date: ${dailyEvent.reservation_dd},
+			</c:if>
+
 			header: {
 				left: 'prev',
 				center: 'title',
@@ -29,7 +35,7 @@
 			},
 			navLinks: true,
 		    navLinkDayClick: function(date, jsEvent) {
-		        var dateParam = "?reservation_date=" + date.format("YYYY") + "-" + date.format("MM") + "-" + date.format("DD");  
+		        var dateParam = "?reservation_date=" + date.format("YYYY") + "-" + date.format("MM") + "-" + date.format("DD");
 		        location.href="reserveDateTime.do" + dateParam;
 		    },
 			editable: true,
@@ -50,21 +56,20 @@
 				}
 				<c:if test="${!status.last}"> , </c:if>
 				</c:forEach>
-						
+
 			]
-		        
+
 		});
-		
+
 		var meetingrooms = [];
 		<c:forEach var="meetingroom" items="${meetingroomList}" varStatus="status">
 			meetingrooms.push('<p class="booking"><span class="circle ${meetingroom.color}"></span>${meetingroom.name}</p>');
 		</c:forEach>
 		var label = $('<div class="room_guide"></div>').append(meetingrooms.join(""));
-		
+
 
 		$(".fc-toolbar.fc-header-toolbar").append(label);
-		
+
 	});
 
 </script>
-
