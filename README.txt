@@ -12,6 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- 테이블 kric.menu_info 구조 내보내기
+DROP TABLE IF EXISTS `menu_info`;
 CREATE TABLE IF NOT EXISTS `menu_info` (
   `MENU_CODE` varchar(30) NOT NULL COMMENT '메뉴코드',
   `PARENT_MENU_CODE` varchar(30) DEFAULT NULL COMMENT '부모메뉴코드',
@@ -149,25 +150,6 @@ INSERT INTO `menu_info` (`MENU_CODE`, `PARENT_MENU_CODE`, `MENU_LOCATION_CODE`, 
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- 테이블 kric.meetingroom_file 구조 내보내기
-CREATE TABLE IF NOT EXISTS `meetingroom_file` (
-  `FILE_KEY` int(11) NOT NULL AUTO_INCREMENT COMMENT '파일고유번호',
-  `MEETINGROOM_KEY` int(11) NOT NULL COMMENT '회의실고유번호',
-  `ORDER_LEVEL` int(11) NOT NULL COMMENT '정렬순서',
-  `REAL_FILE_NAME` varchar(255) NOT NULL COMMENT '실제파일명',
-  `SAVE_FILE_NAME` varchar(255) NOT NULL COMMENT '저장파일명',
-  `FILE_PATH` varchar(255) NOT NULL COMMENT '파일경로',
-  `FILE_EXT` varchar(30) NOT NULL COMMENT '파일확장자명',
-  `FILE_SIZE` int(11) NOT NULL COMMENT '파일사이즈',
-  `FILE_DOWN_CNT` int(11) NOT NULL COMMENT '파일다운로드수',
-  `IMAGE_WIDTH_SIZE` int(11) DEFAULT NULL COMMENT '이미지가로사이즈',
-  `IMAGE_HEIGHT_SIZE` int(11) DEFAULT NULL COMMENT '이미지세로사이즈',
-  `STATUS` varchar(1) NOT NULL COMMENT '상태',
-  `REG_DATE` datetime NOT NULL COMMENT '등록일시',
-  PRIMARY KEY (`FILE_KEY`,`MEETINGROOM_KEY`),
-  KEY `FK_MEETINGROOM_TO_BOARD_FILE` (`MEETINGROOM_KEY`),
-  CONSTRAINT `FK_MEETINGROOM_TO_BOARD_FILE` FOREIGN KEY (`MEETINGROOM_KEY`) REFERENCES `meetingroom_info` (`MEETINGROOM_KEY`)
-) ENGINE=InnoDB AUTO_INCREMENT=347 DEFAULT CHARSET=utf8 COMMENT='미팅룸첨부파일정보';
 
 -- 내보낼 데이터가 선택되어 있지 않습니다.
 -- 테이블 kric.meetingroom_info 구조 내보내기
@@ -190,7 +172,28 @@ CREATE TABLE IF NOT EXISTS `meetingroom_info` (
   `STATUS` char(1) NOT NULL DEFAULT 'Y' COMMENT 'Y: 등록 D:삭제',
   `COLOR` char(7) DEFAULT NULL,
   PRIMARY KEY (`MEETINGROOM_KEY`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='Meeting Room Info\r\nAdded by Karl on 2017.12.13';
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='Meeting Room Info\r\nAdded by Karl on 2017.12.13';
+
+
+-- 테이블 kric.meetingroom_file 구조 내보내기
+CREATE TABLE IF NOT EXISTS `meetingroom_file` (
+  `FILE_KEY` int(11) NOT NULL AUTO_INCREMENT COMMENT '파일고유번호',
+  `MEETINGROOM_KEY` int(11) NOT NULL COMMENT '회의실고유번호',
+  `ORDER_LEVEL` int(11) NOT NULL COMMENT '정렬순서',
+  `REAL_FILE_NAME` varchar(255) NOT NULL COMMENT '실제파일명',
+  `SAVE_FILE_NAME` varchar(255) NOT NULL COMMENT '저장파일명',
+  `FILE_PATH` varchar(255) NOT NULL COMMENT '파일경로',
+  `FILE_EXT` varchar(30) NOT NULL COMMENT '파일확장자명',
+  `FILE_SIZE` int(11) NOT NULL COMMENT '파일사이즈',
+  `FILE_DOWN_CNT` int(11) NOT NULL COMMENT '파일다운로드수',
+  `IMAGE_WIDTH_SIZE` int(11) DEFAULT NULL COMMENT '이미지가로사이즈',
+  `IMAGE_HEIGHT_SIZE` int(11) DEFAULT NULL COMMENT '이미지세로사이즈',
+  `STATUS` varchar(1) NOT NULL COMMENT '상태',
+  `REG_DATE` datetime NOT NULL COMMENT '등록일시',
+  PRIMARY KEY (`FILE_KEY`,`MEETINGROOM_KEY`),
+  KEY `FK_MEETINGROOM_TO_BOARD_FILE` (`MEETINGROOM_KEY`),
+  CONSTRAINT `FK_MEETINGROOM_TO_BOARD_FILE` FOREIGN KEY (`MEETINGROOM_KEY`) REFERENCES `meetingroom_info` (`MEETINGROOM_KEY`)
+) ENGINE=InnoDB AUTO_INCREMENT=362 DEFAULT CHARSET=utf8 COMMENT='미팅룸첨부파일정보';
 
 -- 내보낼 데이터가 선택되어 있지 않습니다.
 -- 테이블 kric.reservation_info 구조 내보내기
@@ -213,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `reservation_info` (
   `TOTAL_TIMES` varchar(20) NOT NULL,
   `EVENT_NAME` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`RESERVATION_KEY`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 
 -- 내보낼 데이터가 선택되어 있지 않습니다.
 -- 테이블 kric.reservation_mapp 구조 내보내기
