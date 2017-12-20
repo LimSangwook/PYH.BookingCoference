@@ -22,12 +22,6 @@
 	$(document).ready(function() {
 
 		$('#calendar').fullCalendar({
-			<c:if test="${dailyEvent.reservation_yyyy  && dailyEvent.reservation_mm && dailyEvent.reservation_dd}">
-		  year: ${dailyEvent.reservation_yyyy},
-		  month: ${dailyEvent.reservation_mm},
-		  date: ${dailyEvent.reservation_dd},
-			</c:if>
-
 			header: {
 				left: 'prev',
 				center: 'title',
@@ -69,7 +63,10 @@
 
 
 		$(".fc-toolbar.fc-header-toolbar").append(label);
-
+		
+		<c:if test="${not empty reserve.reservation_date}">
+		$('#calendar').fullCalendar('gotoDate', '${reserve.reservation_date}');
+		</c:if>
 	});
 
 </script>

@@ -142,9 +142,6 @@ public class MainController extends CommonWebUtils{
 
 			GenerateDto generateData = dataService.selectGenerate();
 			mav.addObject("generateData", generateData);
-
-			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList();
-			mav.addObject("dailyEvent", dailyEvent);
 			
 		} catch (Exception e) {
 			if(log.isWarnEnabled())log.warn(e.toString());
@@ -153,6 +150,36 @@ public class MainController extends CommonWebUtils{
 		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".front_index()");
 		return mav;
 	}
+
+	/**
+	 * 회의실 /날짜/시간 선택
+	 * @param request
+	 * @param ReserveDto
+	 * @return ModelAndView
+	 * @throws Exception
+	 */
+	@RequestMapping("/front/**/getReservedDays")
+	public ModelAndView reserveDateTimeJson(HttpServletRequest request, ReserveDto reserve) throws Exception{
+		if(log.isDebugEnabled())log.debug("[START] " + this.getClass().getName() + ".getReservedDays()");
+
+		ModelAndView mav = new ModelAndView("jsonViewer");
+
+		try {
+			mav.addObject("RESULT_CODE","SUCCESS");
+			System.out.println("===========================> " + reserve.getReservation_yyyy());
+			mav.addObject("reservedDays", reserveService.getReserveCalendarList(reserve));
+
+		} catch (Exception e) {
+			mav.addObject("RESULT_CODE","FAIL");
+			if(log.isWarnEnabled())log.warn(e.getMessage());
+		}
+
+
+		if(log.isDebugEnabled())log.debug("[END] " + this.getClass().getName() + ".getReservedDays()");
+		return mav;
+	}
+	
+
 	
 	/**
 	 * 박물관 템플릿 메인

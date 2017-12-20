@@ -329,69 +329,103 @@
           </section>
           <script type="text/javascript">
            function ShowCalenda(nyear,nMonth) {
-
-            var arrweekDay = new Array("일", "월", "화", "수", "목", "금", "토");
-            var arrLstMonth = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
-            var arrLstDay = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-            var objnow = new Date();
-
-            if (nyear == null){
-              var nyear = objnow.getYear();
+        	   
+       	    if (nyear == null){
+      	      var objnow = new Date();
+              nyear = objnow.getFullYear();
+              nMonth = objnow.getMonth();
             }
-            if(nyear<=200){
-                nyear += 1900;
-            }
-
-            var ojbMonth = objnow.getMonth();
-            if (((nyear % 4 == 0) && (nyear % 100 != 0)) || (nyear % 400 == 0)) arrLstDay[1] = 29;
-            var ndate = objnow.getDate();
-            if (nMonth == null) {
-              var nMonth = objnow.getMonth();
-            } else {
-              var nMonth = parseInt(nMonth);
-              if (nMonth > 11){
-                nMonth = 0;
-                nyear = nyear + 1;
-              }else if (nMonth < 0){
-                nMonth = 11;
-                nyear = nyear - 1;
-              };
-            };
-            var firstTmp = new Date(nyear, nMonth, 1);
-            var nFstDay = firstTmp.getDay() + 1;
-            var strHtml = "";
-
-            strHtml += "<a href=\"javascript:ShowCalenda("+nyear+"," + (nMonth - 1) + ");\" class=\"cal_prev\">&lt;</a><a href=\"javascript:ShowCalenda("+nyear+"," + (nMonth + 1) + ");\" class=\"cal_next\">&gt;</a>";
-            strHtml += "<div class=\"month\">" + nyear + ". " + arrLstMonth[nMonth] + "</div>";
-            strHtml += "<table><caption>달력</caption><thead><tr>";
-            for (var i = 0; i < 7; i++) strHtml += "<th>" + arrweekDay[i] + "</th>";
-            strHtml += "</tr></thead>";
-            var ndays = 1;
-            var strnbsp = 1;
-            for (var i = 1; i <= Math.ceil((arrLstDay[nMonth] + nFstDay - 1) / 7); ++i) {
-              strHtml += "<tr>";
-
-              for (var j = 1; j <= 7; j++) {
-                if (ndays <= arrLstDay[nMonth]) {
-                  if (strnbsp < nFstDay) {
-                    strHtml += "<td>&nbsp;</td>";
-                    strnbsp++;
-                  } else {
-               	  	<c:forEach var="event" items="${dailyEvent}" varStatus="status">
-                    if (ndays == "${event.reservation_dd}" && ojbMonth == "${event.reservation_mm}") {// 일정있는날짜 확인(2월 25일 예시)
-                      var getCurTime = func_Time();
-                      strHtml += "<td class=\"show\"><a href=\"reserveCalendarList.do?reservation_yyyy=${event.reservation_dd}&reservation_mm=${event.reservation_mm}&reservation_dd=${event.reservation_dd}\"><span>" + ndays + "</span></a></td>";
-                    } else strHtml += "<td class='" + (j == 1 ? "sun" : (j == 7 ? "sat" : "")) + "'><span>" + ndays + "</span></td>";
-                     </c:forEach>
-                      ndays++
-                    };
-                } else strHtml += "<td>&nbsp;</td>";
-              };
-              strHtml += "</tr>"
-            };
-            strHtml += "</table>";
-            document.getElementById("calenda").innerHTML = strHtml;
-            document.getElementById("calenda2").innerHTML = strHtml;
+       	    
+	       	 var nMonth = parseInt(nMonth);
+	         if (nMonth > 11){
+	           nMonth = 0;
+	           nyear = nyear + 1;
+	         }else if (nMonth < 0){
+	           nMonth = 11;
+	           nyear = nyear - 1;
+	         };
+	         
+       	    console.log("nyear : " + nyear, "nMonth : " + nMonth);
+        	   
+       	    var params = {reservation_yyyy : nyear , reservation_mm : nMonth}
+       		ajaxCall(params,'getReservedDays.do');
+       		ajaxRes.success(function(result){				
+       			if(result.RESULT_CODE == 'SUCCESS'){
+       				var reservedDay = [];
+       				for (var i = 0; i < result.reservedDays.length; i++) {
+       					reservedDay[i] = result.reservedDays[i].reservation_dd;
+       				}
+       				drawCalenda(nyear, nMonth, reservedDay)
+       			} else {
+       				alert("실패");
+       			}						
+       		});
+			
+       		function drawCalenda(nyear, nMonth, reservedDay){
+	            var arrweekDay = new Array("일", "월", "화", "수", "목", "금", "토");
+	            var arrLstMonth = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+	            var arrLstDay = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+	    		
+	            var objnow = new Date();
+	
+	            if (nyear == null){
+	              var nyear = objnow.getYear();
+	            }
+	            if(nyear<=200){
+	                nyear += 1900;
+	            }
+	
+	            var ojbMonth = objnow.getMonth();
+	            if (((nyear % 4 == 0) && (nyear % 100 != 0)) || (nyear % 400 == 0)) arrLstDay[1] = 29;
+	            var ndate = objnow.getDate();
+	            if (nMonth == null) {
+	              var nMonth = objnow.getMonth();
+	            } else {
+	              var nMonth = parseInt(nMonth);
+	              if (nMonth > 11){
+	                nMonth = 0;
+	                nyear = nyear + 1;
+	              }else if (nMonth < 0){
+	                nMonth = 11;
+	                nyear = nyear - 1;
+	              };
+	            };
+	            var firstTmp = new Date(nyear, nMonth, 1);
+	            var nFstDay = firstTmp.getDay() + 1;
+	            var strHtml = "";
+	
+	            strHtml += "<a href=\"javascript:ShowCalenda("+nyear+"," + (nMonth - 1) + ");\" class=\"cal_prev\">&lt;</a><a href=\"javascript:ShowCalenda("+nyear+"," + (nMonth + 1) + ");\" class=\"cal_next\">&gt;</a>";
+	            strHtml += "<div class=\"month\">" + nyear + ". " + arrLstMonth[nMonth] + "</div>";
+	            strHtml += "<table><caption>달력</caption><thead><tr>";
+	            for (var i = 0; i < 7; i++) strHtml += "<th>" + arrweekDay[i] + "</th>";
+	            strHtml += "</tr></thead>";
+	            var ndays = 1;
+	            var strnbsp = 1;
+	            for (var i = 1; i <= Math.ceil((arrLstDay[nMonth] + nFstDay - 1) / 7); ++i) {
+	              strHtml += "<tr>";
+	
+	              for (var j = 1; j <= 7; j++) {
+	                if (ndays <= arrLstDay[nMonth]) {
+	                  if (strnbsp < nFstDay) {
+	                    strHtml += "<td>&nbsp;</td>";
+	                    strnbsp++;
+	                  } else {
+	                    if (reservedDay.indexOf(ndays.toString()) >= 0) {// 일정있는날짜 확인(2월 25일 예시)
+	                      var getCurTime = func_Time();
+	                      strHtml += "<td class=\"show\"><a href=\"/front/reservation/reserve/reserveCalendar.do?reservation_date="+nyear+"-"+(nMonth+1)+"-"+ndays+"\"><span>" + ndays + "</span></a></td>";
+	                    } else strHtml += "<td class='" + (j == 1 ? "sun" : (j == 7 ? "sat" : "")) + "'><span>" + ndays + "</span></td>";
+	                      ndays++
+	                      
+	                    };
+	                } else strHtml += "<td>&nbsp;</td>";
+	              };
+	              strHtml += "</tr>"
+	            };
+	            strHtml += "</table>";
+	            document.getElementById("calenda").innerHTML = strHtml;
+	            document.getElementById("calenda2").innerHTML = strHtml;
+       			
+       		}
           };
           function func_Time() {
             var now = new Date();

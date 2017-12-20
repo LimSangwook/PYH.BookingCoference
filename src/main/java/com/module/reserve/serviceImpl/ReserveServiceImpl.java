@@ -96,7 +96,7 @@ public class ReserveServiceImpl implements ReserveService{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ReserveDto> getReserveCalendarList() throws Exception {
-		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReserveCalendarList");		
+	public List<ReserveDto> getReserveCalendarList(ReserveDto reserve) throws Exception {
+		return (List<ReserveDto>)commonDao.queryForObjectList("RESERVE.getReserveCalendarList", reserve);		
 	}
 }

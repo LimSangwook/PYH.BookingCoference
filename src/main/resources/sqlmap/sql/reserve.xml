@@ -332,7 +332,15 @@
 	 FROM RESERVATION_MAPP RM
 	 GROUP BY RESERVATION_KEY) RESERVATION ON RESERVATION.RESERVATION_KEY = RI.RESERVATION_KEY
 	 GROUP BY RESERVATION.RESERVATION_DATE, RI.STATUS
-	) A
+	) A 
+	WHERE 1 = 1
+	<isNotEmpty prepend="AND" property="reservation_yyyy">
+   		RESERVATION_YYYY = #reservation_yyyy#
+   	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="reservation_mm">
+   		RESERVATION_MM = #reservation_mm#
+   	</isNotEmpty>
+   	
 	</select>
 	
 	

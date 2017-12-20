@@ -53,21 +53,9 @@ public class ReserveController extends CommonWebUtils{
 
 		ModelAndView mav = new ModelAndView("siteManage/reserve/reserveCalendarList");
 		try {
-			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList();
+			List<ReserveDto> dailyEvent = reserveService.getReserveCalendarList(reserve);
 			List<MeetingroomDto> meetingroomList = meetingroomService.getMeetingroomList();
 			mav.addObject("meetingroomList", meetingroomList);
-
-			if (reserve.getReservation_yyyy != null && !"".equals(reserve.getReservation_yyyy)) {
-				dailyEvent.setReservation_yyyy(reserve.getReservation_yyyy);
-			}
-
-			if (reserve.getReservation_mm != null && !"".equals(reserve.getReservation_mm)) {
-				dailyEvent.setReservation_mm(reserve.getReservation_mm);
-			}
-
-			if (reserve.getReservation_dd != null && !"".equals(reserve.getReservation_dd)) {
-				dailyEvent.setReservation_dd(reserve.getReservation_dd);
-			}
 			
 			mav.addObject("dailyEvent", dailyEvent);
 
@@ -180,6 +168,7 @@ public class ReserveController extends CommonWebUtils{
 			List<MeetingroomDto> meetingroomList = meetingroomService.getMeetingroomList();
 			mav.addObject("meetingroomList", meetingroomList);
 			mav.addObject("eventList", eventList);
+			mav.addObject("reserve", reserve);
 
 		} catch (Exception e) {
 			if(log.isDebugEnabled())log.debug(e.toString());

@@ -110,14 +110,13 @@
 	}
 	
 	function changeTime(obj) {
-		alert("!");
-		if ($(this).hasClass("none")) {
+		if ($(obj).hasClass("none")) {
 			alert("이미 예약이 완료된 회의실 입니다.");
 			return;
 		}
 		
-		if ($(this).hasClass("select")) {
-			$(this).toggleClass("select");
+		if ($(obj).hasClass("select")) {
+			$(obj).toggleClass("select");
 			return;			
 		}
 		
@@ -127,16 +126,15 @@
 				serial = true;
 			}
 		});
-				
+		
 		if (serial) {
-			if (!$(this).parent("li").next().children("a").hasClass("select") && !$(this).parent("li").prev().children("a").hasClass("select")) {
+			if (!$(obj).parent("li").next().children("a").hasClass("select") && !$(obj).parent("li").prev().children("a").hasClass("select")) {
 				alert("연속된 회의실만 선택 할 수 있습니다.");
 				return;
 			}			
 		}
 		
-	    $(this).toggleClass("select");
-		
+	    $(obj).toggleClass("select");		
 	}
 	
 	function changeMonth(y, m, n) {
@@ -171,7 +169,7 @@
 		var timeList = result.timeList;
 		var newTimeList = [];
 		for (var i = 0; i < timeList.length; i++) {
-			newTimeList.push('<li><a href="javascript:void(0);" data="'+timeList[i].reservation_time+'" class="time ');
+			newTimeList.push('<li><a href="javascript:void(0);" onclick="changeTime(this)" data="'+timeList[i].reservation_time+'" class="time ');
 			if (timeList[i].time_availability == 0) {
 				newTimeList.push('none');	
 			}
