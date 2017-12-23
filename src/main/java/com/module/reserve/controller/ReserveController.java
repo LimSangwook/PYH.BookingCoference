@@ -14,7 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.baroservice.ws.BaroServiceSMS;
 import com.common.util.CommonWebUtils;
+import com.common.util.JProperties;
 import com.common.util.PagingUtil;
 import com.module.main.service.MainService;
 import com.module.meetingroom.dto.MeetingroomDto;
@@ -39,6 +41,7 @@ public class ReserveController extends CommonWebUtils{
 
 	@Autowired
 	private ReserveService reserveService;
+	
 
 	/**
 	 * 회의실 관리 목록 - 달력
@@ -414,8 +417,27 @@ public class ReserveController extends CommonWebUtils{
 
 		try {
 			reserveService.reserveUpdate(reserve);
+			ReserveDto result = reserveService.reserveApproval(reserve);
 			returnPage = "reserveApproval.do?reservation_key="+reserve.getReservation_key();
+			result.setMessage(result.getStatus(), result.getName(), result.getStatus_name(), result.getMeetingroom_name(), result.getTotal_price(), result.getReservation_date(), result.getTotal_times());
+			
+		    if (reserve.getStatus() != null && !"W".equals(reserve.getStatus())) {
+				String CERTKEY = JProperties.getString("BARO.SMS.WS.CERTKEY"); //인증키
+				String CorpNum = JProperties.getString("BARO.SMS.WS.CORPNUM");		//연계사업자 사업자번호 ('-' 제외, 10자리) 		
+				String SenderID = JProperties.getString("BARO.SMS.WS.SENDERID");		//연계사업자 담당자 아이디
+				String FromNumber = JProperties.getString("BARO.SMS.WS.FROMNUMBER");;		//발신번호
+				String ToName = result.getName();			//수신자명
+				String ToNumber = result.getPhone_number_1()+result.getPhone_number_2()+result.getPhone_number_3();		//수신번호
+				String Contents = result.getMessage();		//내용
+				String SendDT = "";			//전송일시 (yyyyMMddHHmmss 형식) (빈 문자열 입력시 즉시 전송, 미래일자 입력시 예약 전송)
+				String RefKey = "";			//연동사부여 전송키
 
+				BaroServiceSMS BS_SMS = new BaroServiceSMS();
+				String Result = BS_SMS.getBaroServiceSMSSoap().sendMessage(CERTKEY, CorpNum, SenderID, FromNumber, ToName, ToNumber, Contents, SendDT, RefKey);
+				
+				System.out.println("Result====> " + Result);
+			}	
+		    
 			redirectView(mav, "", returnPage);
 		} catch (Exception e) {
 			if(log.isDebugEnabled())log.debug(e.toString());

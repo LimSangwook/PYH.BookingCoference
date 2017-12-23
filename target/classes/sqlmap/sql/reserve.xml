@@ -380,6 +380,10 @@
 	     , RI.EMAIL_ADDR_1
 	  	 , RI.REQUEST
 	  	 , RI.STATUS
+	  	 , CASE RI.STATUS WHEN 'A' THEN '승인'
+	  	 	           WHEN 'W' THEN '신청'
+	  	 	           WHEN 'R' THEN '반려'
+	  	 	END STATUS_NAME
 	  	 , RI.STATUS_TIME
 	     , IFNULL(RI.EMAIL_ADDR_2, RI.EMAIL_ADDR_3) EMAIL_ADDR_2
 	     , IFNULL(RI.EMAIL_ADDR_3, RI.EMAIL_ADDR_2) EMAIL_ADDR_3

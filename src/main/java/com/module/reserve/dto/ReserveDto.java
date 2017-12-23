@@ -89,6 +89,9 @@ public class ReserveDto extends BaseForm{
 	/* 행사명 */
 	private String event_name;
 	
+	/* SMS내용 */
+	private String message;
+	
 	/* 수 */
 	private String cnt;
 	
@@ -442,7 +445,23 @@ public class ReserveDto extends BaseForm{
 
 	public void setCnt(String cnt) {
 		this.cnt = cnt;
-	}	
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String status, String name, String statusName, String meetingroomName, String totalPrice, String reservationDate, String totalTimes) {
+		this.message = name + "님께서 신청하신 회의실 예약건이 " + statusName + " 되었습니다.";
+		if (status != null && "A".equals(status)) {
+			this.message = this.message + "  ==상세==";
+			this.message = this.message + "  회의실 : " + meetingroomName;
+			this.message = this.message + "  예약일자 : " + reservationDate;
+			this.message = this.message + "  예약시간 : " + totalTimes;
+			this.message = this.message + "  가격 : " + totalTimes;
+		}
+		this.message = this.message + "  문의사항이 있으신 경우 연락바랍니다.";
+	}		
 	
 	
 	
